@@ -359,6 +359,38 @@ button.row:active,.row.tap:active{background:var(--fill)}
 .hist i{display:block;width:100%;border-radius:6px 6px 3px 3px;background:var(--pos);min-height:3px}
 .hist i.n{background:var(--neg)}
 .hist b{font-size:12.5px;font-weight:650}.hist span{font-size:11px;color:var(--text3);white-space:nowrap}
+
+/* ---------- v0.4 : captures ---------- */
+.calc b{color:var(--text)}
+.piprule{margin-top:8px}
+.shotadd{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:64px;border-radius:16px;border:1.5px dashed var(--fill2);color:var(--text2);font-size:15px;font-weight:600}
+.shotadd svg{width:22px;height:22px}
+.shotrow{display:flex;align-items:center;gap:14px;background:var(--card);box-shadow:var(--card-shadow);border-radius:16px;padding:8px}
+.shotrow img{width:92px;height:64px;object-fit:cover;border-radius:11px;background:var(--fill);cursor:zoom-in}
+.shotrow div{display:flex;gap:14px}
+.shotv{position:relative;display:block;width:100%;margin-top:12px;border-radius:16px;overflow:hidden;background:var(--fill);box-shadow:var(--card-shadow)}
+.shotv img{display:block;width:100%;height:150px;object-fit:cover}
+.shotv span{position:absolute;right:8px;bottom:8px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.45);color:#fff}
+.shotv span svg{width:15px;height:15px}
+.viewer{position:fixed;inset:0;z-index:120;background:rgba(0,0,0,.92);display:grid;place-items:center;padding:calc(var(--safe-t) + 50px) 10px calc(var(--safe-b) + 20px);opacity:0;transition:opacity .25s}
+.viewer.on{opacity:1}
+.viewer img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
+.viewer .ib{position:absolute;top:calc(var(--safe-t) + 10px);right:14px;background:rgba(255,255,255,.14);color:#fff}
+
+/* ---------- v0.5 : rappels ---------- */
+#tabbar .tab .badge{position:absolute;top:7px;left:calc(50% + 4px);min-width:17px;height:17px;padding:0 5px;border-radius:9px;background:var(--neg);color:#fff;font-size:10.5px;font-weight:800;display:grid;place-items:center;line-height:1;pointer-events:none}
+.recap p{margin:8px 0 0;font-size:15px;line-height:1.5;color:var(--text2)}
+.rlist{display:flex;flex-direction:column;gap:8px}
+.rem{display:flex;gap:12px;background:var(--card);box-shadow:var(--card-shadow);border-radius:18px;padding:13px 14px}
+.ri{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;flex:none;background:var(--fill);color:var(--text2)}
+.ri svg{width:18px;height:18px}
+.rem.bad .ri{background:var(--neg-bg);color:var(--neg)}.rem.warn .ri{background:rgba(201,162,94,.14);color:#C9A25E}
+.rem.ok .ri,.rem.goal .ri{background:var(--pos-bg);color:var(--pos)}
+.rt{flex:1;min-width:0}.rt b{display:block;font-size:15.5px;font-weight:650;line-height:1.3}
+.rt small{display:block;font-size:13.5px;color:var(--text3);margin-top:3px;line-height:1.4}
+.rt .mt-b{margin:9px 0 2px}.rt .lnk{padding:6px 0 0;font-size:14px}
+.swr.sep{border-top:.5px solid var(--sep)}
+.tin{border:0;background:var(--fill);color:var(--text);font:inherit;font-size:16px;font-weight:600;border-radius:10px;padding:6px 10px;-webkit-appearance:none;appearance:none}
 @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
 </style>
 </head>
@@ -372,6 +404,7 @@ button.row:active,.row.tap:active{background:var(--fill)}
     <section class="page" id="pAdd"></section>
     <section class="page" id="pStats"></section>
     <section class="page" id="pCal"></section>
+    <section class="page" id="pRem"></section>
   </div>
   <nav id="tabbar"><div id="bubble"></div></nav>
 </div>
@@ -380,12 +413,13 @@ button.row:active,.row.tap:active{background:var(--fill)}
 <div id="toast"></div>
 <input type="file" id="fileIn" accept=".json,application/json" hidden>
 <input type="file" id="photoIn" accept="image/*" hidden>
+<input type="file" id="shotIn" accept="image/*" hidden>
 
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
 const KEY="journal.v1";
-const VERSION="0.3";
+const VERSION="0.6";
 
 /* ================= icônes ================= */
 const IC={
@@ -415,6 +449,9 @@ const IC={
   x:'<path d="M7 7l10 10M17 7 7 17"/>',
   sliders:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/>',
   gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  image:'<rect x="3.5" y="5" width="17" height="14" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="m4.5 17 5-4.5 3.5 3 2.5-2 4 3.5"/>',
+  bell:'<path d="M6.5 16.5V11a5.5 5.5 0 0 1 11 0v5.5l1.5 2h-14z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/>',
+  flag:'<path d="M6 21V4M6 4.5h10.5l-2 4 2 4H6"/>',
   table:'<rect x="4" y="5" width="16" height="14" rx="2.5"/><path d="M4 10h16M4 14.5h16M10 10v9"/>',
   book:'<path d="M5 5.5A1.5 1.5 0 0 1 6.5 4H19v14H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19"/>'
 };
@@ -433,6 +470,7 @@ function fix(s){
   if(!s.accounts.some(a=>a.id===s.acc))s.acc=s.accounts[0].id;
   s.trades.forEach(t=>{if(!t.a||!s.accounts.some(a=>a.id===t.a))t.a=s.accounts[0].id});
   s.profile=Object.assign({first:"",last:"",photo:""},s.profile||{});
+  delete s.notif;
   // v0.3 : « Compte perso » devient « Compte réel » ; règles des prop firms
   s.accounts.forEach(a=>{if(a.type!=="prop")a.type="real";if(a.type==="prop"){a.ch=a.ch||"two";if(a.phase==null)a.phase=a.ch==="instant"?3:1;["dd","mdd","t1","t2"].forEach(k=>{if(a[k]==null)a[k]=PRESETS[a.ch][k]})}});
   if(s.settings.setups.join()==="Cassure,Pullback,Range,Tendance")s.settings.setups=["FVG","IFVG","Retour FVG","ODB","Retour ODB","Liquidity Sweep","OTE"];
@@ -441,10 +479,33 @@ function fix(s){
 const PRESETS={two:{dd:5,mdd:10,t1:10,t2:5},one:{dd:3,mdd:10,t1:10,t2:null},instant:{dd:3,mdd:6,t1:null,t2:null}};
 function load(){try{return fix(JSON.parse(localStorage.getItem(KEY)))}catch(_){return fix({})}}
 const S=load();
-function save(){FXC=null;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(_){toast("Impossible d'enregistrer")}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(_){toast("Impossible d'enregistrer")}}
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const num=v=>{if(v==null||v==="")return null;const n=parseFloat(String(v).replace(/\s/g,"").replace(",","."));return isFinite(n)?n:null};
+
+/* ================= captures d'écran (rangées à part, sur le téléphone) ================= */
+const IMG=(()=>{let dbp=null;
+  const open=()=>dbp||(dbp=new Promise((res,rej)=>{const q=indexedDB.open("journal-img",2);q.onupgradeneeded=()=>{const db=q.result;if(!db.objectStoreNames.contains("img"))db.createObjectStore("img");if(!db.objectStoreNames.contains("snap"))db.createObjectStore("snap")};q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)}));
+  const tx=(store,mode,fn)=>open().then(db=>new Promise((res,rej)=>{const x=db.transaction(store,mode),q=fn(x.objectStore(store));x.oncomplete=()=>res(q&&q.result);x.onerror=()=>rej(x.error)}));
+  return {get:k=>tx("img","readonly",st=>st.get(k)),set:(k,v)=>tx("img","readwrite",st=>st.put(v,k)),del:k=>tx("img","readwrite",st=>st.delete(k)),
+    setSnap:v=>tx("snap","readwrite",st=>st.put(v,"s"))};
+})();
+const dropImgs=list=>list.forEach(t=>{if(t.img)IMG.del(t.img).catch(()=>{})});
+// photo réduite (1600 px max) pour ne pas remplir le téléphone
+function pickShot(cb){
+  const inp=$("shotIn");inp.value="";
+  inp.onchange=()=>{const f=inp.files[0];if(!f)return;const url=URL.createObjectURL(f),im=new Image();
+    im.onload=()=>{const k=Math.min(1,1600/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement("canvas");c.width=Math.round(im.naturalWidth*k);c.height=Math.round(im.naturalHeight*k);
+      c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(url);cb(c.toDataURL("image/jpeg",.82))};
+    im.onerror=()=>{URL.revokeObjectURL(url);toast("Impossible d'ouvrir cette image")};im.src=url};
+  inp.click();
+}
+function viewShot(src){
+  const v=document.createElement("div");v.className="viewer";v.innerHTML=`<img src="${src}" alt="Capture du trade"><button class="ib" aria-label="Fermer">${ic("x",2.2)}</button>`;
+  document.body.appendChild(v);requestAnimationFrame(()=>v.classList.add("on"));
+  v.onclick=()=>{v.classList.remove("on");setTimeout(()=>v.remove(),300)};
+}
 
 /* ================= calculs ================= */
 const ACC=()=>S.accounts.find(a=>a.id===S.acc)||S.accounts[0];
@@ -456,33 +517,55 @@ const phaseName=a=>a.phase>=3?"Compte financé":"Étape "+a.phase;
 const accSub=a=>isProp(a)?[a.firm,CH[a.ch],phaseName(a)].filter(Boolean).join(" · "):"Compte réel";
 const CUR=()=>ACC().cur||"€";
 function money(v,sign,cur){const s=Math.abs(v).toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2});return (v<-0.004?"−":sign&&v>0.004?"+":"")+s+" "+(cur||CUR())}
-const money0=(v,cur)=>Math.round(v).toLocaleString("fr-FR")+" "+(cur||CUR());
+const money0=(v,cur)=>(Math.round(v)<0?"−":"")+Math.abs(Math.round(v)).toLocaleString("fr-FR")+" "+(cur||CUR());
 function moneyBig(v,sign){const s=money(v,sign),i=s.lastIndexOf(",");return esc(s.slice(0,i))+'<span class="cts">'+esc(s.slice(i))+"</span>"}
 const pct=(v,d=1)=>(v*100).toLocaleString("fr-FR",{maximumFractionDigits:d})+" %";
 const cls=v=>v>0.004?"pos":v<-0.004?"neg":"";
-const fx=(v,d=1)=>(v>0?"+":v<0?"−":"")+Math.abs(v).toLocaleString("fr-FR",{maximumFractionDigits:d});
+const fx=(v,d=1)=>(v<0&&Math.abs(v)>=Math.pow(10,-d)/2?"−":"")+Math.abs(v).toLocaleString("fr-FR",{maximumFractionDigits:d});
 const nf=(v,d=1)=>v.toLocaleString("fr-FR",{maximumFractionDigits:d});
-const IDX=/NAS|US30|US100|US500|SPX|GER|DAX|DJ|BTC|ETH/i;
-const pipSize=p=>/XAU|GOLD/i.test(p)?0.1:/XAG|JPY/i.test(p)?0.01:IDX.test(p)?1:0.0001;
-// taille d'un lot : forex 100 000, or 100 onces, argent 5 000, indices et crypto 1
-const contract=p=>/XAU|GOLD/i.test(p)?100:/XAG/i.test(p)?5000:IDX.test(p)?1:100000;
+// Taille du pip et taille d'un lot standard, actif par actif (conventions MetaTrader / prop firms) :
+//  - paires forex : 1 pip = 0,0001 (le 5e chiffre après la virgule = un dixième de pip) ; 1 lot = 100 000
+//  - paires avec le yen (USD/JPY, EUR/JPY, GBP/JPY…) : 1 pip = 0,01 ; 1 lot = 100 000
+//  - or XAU/USD : 1 pip = 0,10 $ ; 1 lot = 100 onces  → 10 $ par pip et par lot
+//  - argent XAG/USD : 1 pip = 0,01 $ ; 1 lot = 5 000 onces → 50 $ par pip et par lot
+//  - pétrole (WTI, Brent) : 1 pip = 0,01 $ ; 1 lot = 1 000 barils → 10 $ par pip et par lot
+//  - indices (US30, NAS100, SPX500, GER40…) et crypto : on compte en points (1,0) ; 1 lot = 1
+const IDX=/NAS|US30|US100|US500|SPX|USTEC|DJ30|GER|DAX|DE40|UK100|FTSE|JP225|NIKKEI|FRA40|CAC|EU50|STOXX|HK50|AUS200|BTC|ETH|SOL|XRP|LTC/i;
+function asset(p){
+  const P=(p||"").toUpperCase().replace(/\s/g,"");
+  if(/XAU|GOLD/.test(P))return {pip:.1,size:100,unit:"pips",q:"USD",txt:"1 pip = 0,10 sur le prix (ex. 2650,00 → 2650,10)"};
+  if(/XAG|SILVER/.test(P))return {pip:.01,size:5000,unit:"pips",q:"USD",txt:"1 pip = 0,01 sur le prix (ex. 31,50 → 31,51)"};
+  if(/OIL|WTI|BRENT|XTI|XBR/.test(P))return {pip:.01,size:1000,unit:"pips",q:"USD",txt:"1 pip = 0,01 sur le prix"};
+  if(IDX.test(P)){const q=/GER|DAX|DE40|FRA40|CAC|EU50|STOXX/.test(P)?"EUR":/UK100|FTSE/.test(P)?"GBP":/JP225|NIKKEI/.test(P)?"JPY":/HK50/.test(P)?"HKD":/AUS200/.test(P)?"AUD":"USD";return {pip:1,size:1,unit:"points",q,txt:"1 point = 1,0 sur le prix"}}
+  const q=P.includes("/")?P.split("/")[1]:P.slice(3,6)||"USD";
+  if(/JPY/.test(P))return {pip:.01,size:100000,unit:"pips",q,txt:"1 pip = 0,01 (ex. 150,25 → 150,26)"};
+  return {pip:.0001,size:100000,unit:"pips",q,txt:"1 pip = 0,0001 (ex. 1,0850 → 1,0851). Le 5e chiffre après la virgule est un dixième de pip."};
+}
+const pipSize=p=>asset(p).pip;
+const unitOf=p=>asset(p).unit;
 const isOpen=t=>t.st==="open";
 const sgn=t=>t.s==="sell"?-1:1;
-function pips(t){if(t.e==null||t.x==null)return null;return (t.x-t.e)/pipSize(t.p)*sgn(t)}
-function riskPips(t){return t.e!=null&&t.sl!=null&&t.sl!==t.e?Math.abs(t.e-t.sl)/pipSize(t.p):null}
-function tpPips(t){return t.e!=null&&t.tp!=null?Math.abs(t.tp-t.e)/pipSize(t.p):null}
+// arrondi au dixième pour éviter les 24,9999999 dus aux calculs de l'ordinateur
+const r1=v=>Math.round(v*10)/10;
+function pips(t){if(t.e==null||t.x==null)return null;return r1((t.x-t.e)/pipSize(t.p)*sgn(t))}
+function riskPips(t){return t.e!=null&&t.sl!=null&&t.sl!==t.e?r1(Math.abs(t.e-t.sl)/pipSize(t.p)):null}
+function tpPips(t){return t.e!=null&&t.tp!=null?r1(Math.abs(t.tp-t.e)/pipSize(t.p)):null}
 function rrPlan(t){const r=riskPips(t),g=tpPips(t);return r&&g!=null?g/r:null}
 function rGot(t){const r=riskPips(t),p=pips(t);return r&&p!=null?p/r:null}
-// cours EUR/USD pour convertir les dollars en euros : celui de ton dernier trade EUR/USD, sinon 1,08
-let FXC=null;
-function eurusd(){if(FXC)return FXC;let best=null;for(const t of S.trades)if(/^EUR\/?USD$/i.test(t.p)&&(t.x||t.e)&&(!best||(t.d+(t.h||""))>(best.d+(best.h||""))))best=t;return FXC=best?(best.x||best.e):1.08}
-// valeur d'un pip pour 1 lot, dans la monnaie du compte
+// conversion en dollars puis dans la monnaie du compte : on prend le cours de ton dernier trade sur la paire utile,
+// sinon un cours moyen (ce n'est qu'une estimation : le vrai montant est celui de ton courtier)
+const FXD={EURUSD:1.08,GBPUSD:1.27,AUDUSD:.66,NZDUSD:.6,USDJPY:150,USDCAD:1.37,USDCHF:.88,USDHKD:7.8};
+function lastPx(pair){let best=null;for(const t of S.trades)if(t.p===pair&&(t.x||t.e)&&(!best||key(t)>key(best)))best=t;return best?(best.x||best.e):null}
+function usdPer(c,t,price){
+  if(!c||c==="USD")return 1;const own=(t&&t.p||"").toUpperCase(),px=price||(t&&(t.x||t.e));
+  if(own===c+"/USD"&&px)return px;if(own==="USD/"+c&&px)return 1/px;
+  let v=lastPx(c+"/USD");if(v)return v;v=lastPx("USD/"+c);if(v)return 1/v;
+  if(FXD[c+"USD"])return FXD[c+"USD"];if(FXD["USD"+c])return 1/FXD["USD"+c];return 1;
+}
+// valeur d'un pip (ou d'un point) pour 1 lot, dans la monnaie du compte
 function pipValue(t,price){
-  const P=(t.p||"").toUpperCase().replace(/\s/g,""),parts=P.split("/"),b=parts[0],q=parts[1]||"";price=price||t.x||t.e;
-  let v=pipSize(P)*contract(P),usd=v;
-  if(!IDX.test(P)&&q&&q!=="USD"&&b==="USD"&&price)usd=v/price;
-  if(CUR()==="€")return usd/(/^EUR\/?USD$/.test(P)&&price?price:eurusd());
-  return usd;
+  const a=asset(t.p),inQuote=a.pip*a.size,usd=inQuote*usdPer(a.q,t,price),c=CUR()==="€"?"EUR":CUR()==="£"?"GBP":CUR()==="CHF"?"CHF":"USD";
+  return usd/usdPer(c,t,price);
 }
 function estimate(t){const p=pips(t);if(p==null||!t.l)return null;return Math.round(p*t.l*pipValue(t)*100)/100}
 function riskMoney(t){const r=riskPips(t);return r!=null&&t.l?r*t.l*pipValue(t,t.e):null}
@@ -525,7 +608,8 @@ const MOIS=["janvier","février","mars","avril","mai","juin","juillet","août","
 const JOURS=["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
 const dObj=s=>new Date(s+"T12:00:00");
 function dayLabel(s){const t=today();if(s===t)return "Aujourd'hui";const ys=iso(new Date(dObj(t)-864e5));if(s===ys)return "Hier";const d=dObj(s);return JOURS[d.getDay()]+" "+d.getDate()+" "+MOIS[d.getMonth()]+(d.getFullYear()!==new Date().getFullYear()?" "+d.getFullYear():"")}
-const shortDate=s=>{const d=dObj(s);return d.getDate()+" "+MOIS[d.getMonth()].slice(0,4).replace(/\.$/,"")+(d.getFullYear()!==new Date().getFullYear()?" "+d.getFullYear():"")};
+const MC=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+const shortDate=s=>{const d=dObj(s);return d.getDate()+" "+MC[d.getMonth()]+(d.getFullYear()!==new Date().getFullYear()?" "+d.getFullYear():"")};
 const monthLabel=k=>{const [y,m]=k.split("-");return MOIS[+m-1].replace(/^./,c=>c.toUpperCase())+" "+y};
 const shiftMonth=(k,n)=>{let [y,m]=k.split("-").map(Number);m+=n;while(m<1){m+=12;y--}while(m>12){m-=12;y++}return y+"-"+String(m).padStart(2,"0")};
 
@@ -568,7 +652,7 @@ function nextPhase(a){a.phase=a.phase===1&&a.ch==="two"?2:3;a.phaseStart=today()
 let toastT;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2300)}
 function tradeRow(t,opts={}){
   const o=isOpen(t),p=pips(t),r=rGot(t);
-  const sub=[t.h||"",t.set||"",p!=null&&!o?fx(p)+" pips":"",o?"En cours":""].filter(Boolean).join(" · ");
+  const sub=[t.h||"",t.set||"",p!=null&&!o?fx(p)+" "+unitOf(t.p):"",o?"En cours":""].filter(Boolean).join(" · ");
   const right=o?`<b class="mut">—</b><small>${t.e!=null?"à "+String(t.e).replace(".",","):""}</small>`:`<b class="${cls(t.r)} num">${money(t.r||0,true)}</b><small class="num">${r!=null?fx(r,2)+" R":opts.date?esc(dayLabel(t.d)):""}</small>`;
   return `<button class="row" data-trade="${t.id}"><div class="dir ${o?"open":t.s}">${ic(t.s==="sell"?"down":"up",2.1)}</div><div class="ti"><b>${esc(t.p)}<span class="tag">${t.s==="sell"?"VENTE":"ACHAT"}</span></b><small>${esc(opts.date?dayLabel(t.d)+(sub?" · "+sub:""):sub)||"&nbsp;"}</small></div><div class="rv">${right}</div></button>`;
 }
@@ -702,7 +786,7 @@ function editAccount(id){
     if(!id){S.accounts.push(o);S.acc=o.id;addT=blank()}
     save();renderAll();w._close();toast(id?"Compte modifié":"Compte créé");
   };
-  const del=q("[data-del]");if(del)del.onclick=()=>confirmSheet("Supprimer « "+a.name+" » ?",n?"Ses "+n+" trade"+(n>1?"s":"")+" seront supprimés aussi. Pense à faire une sauvegarde avant.":"Ce compte n'a aucun trade.","Supprimer",()=>{S.trades=S.trades.filter(t=>t.a!==a.id);S.accounts=S.accounts.filter(x=>x.id!==a.id);if(S.acc===a.id)S.acc=S.accounts[0].id;addT=blank();save();renderAll();w._close();toast("Compte supprimé")});
+  const del=q("[data-del]");if(del)del.onclick=()=>confirmSheet("Supprimer « "+a.name+" » ?",n?"Ses "+n+" trade"+(n>1?"s":"")+" seront supprimés aussi. Pense à faire une sauvegarde avant.":"Ce compte n'a aucun trade.","Supprimer",()=>{dropImgs(S.trades.filter(t=>t.a===a.id));S.trades=S.trades.filter(t=>t.a!==a.id);S.accounts=S.accounts.filter(x=>x.id!==a.id);if(S.acc===a.id)S.acc=S.accounts[0].id;addT=blank();save();renderAll();w._close();toast("Compte supprimé")});
 }
 
 /* ================= Profil & photo (comme Zerly) ================= */
@@ -813,6 +897,7 @@ function formHTML(t){
     <label class="fld wide xo"><small>Sortie (prix de clôture)</small><input data-f="x" inputmode="decimal" value="${v(t.x)}" placeholder="Au moment où tu fermes"></label>
   </div>
   <div class="calc"></div>
+  <p class="hint piprule"></p>
   <div class="xo">
     <span class="fl">Sortie</span>
     <div class="chips wr" data-k="ex">${chipsInner("ex",t)}</div>
@@ -829,7 +914,9 @@ function formHTML(t){
   <div class="chips wr" data-k="emo">${chipsInner("emo",t)}</div>
   <div class="card" style="margin-top:14px"><div class="swr"><span>J'ai respecté mon plan</span><button class="switch${t.plan?" on":""}" data-sw="plan" aria-label="J'ai respecté mon plan"></button></div></div>
   <span class="fl">Notes</span>
-  <label class="fld"><textarea data-f="n" placeholder="Pourquoi je suis entré, ce qui s'est passé, ce que je retiens…">${esc(t.n||"")}</textarea></label>`;
+  <label class="fld"><textarea data-f="n" placeholder="Pourquoi je suis entré, ce qui s'est passé, ce que je retiens…">${esc(t.n||"")}</textarea></label>
+  <span class="fl">Capture d'écran</span>
+  <div class="shotf"></div>`;
 }
 function bindForm(root,t){
   const NUMS=["e","sl","tp","x","l","r","fee"];
@@ -841,10 +928,12 @@ function bindForm(root,t){
   const upd=()=>{read();exAuto();
     const o=t.st==="open";root.querySelectorAll(".xo").forEach(x=>x.style.display=o?"none":"");
     const rk=riskPips(t),tk=tpPips(t),rr=rrPlan(t),rm=riskMoney(t),gm=gainMoney(t),p=pips(t),rg=rGot(t),es=estimate(t),cap=CAP();
-    let h=cell("Stop",rk!=null?nf(rk)+" pips":"—")+cell("Objectif",tk!=null?nf(tk)+" pips":"—")+cell("R:R prévu",rr!=null?"1 : "+nf(rr,2):"—")
-      +cell("Risque",rm!=null?money0(rm):"—","neg")+cell("Risque %",rm!=null&&cap?nf(rm/cap*100,2)+" %":"—")+cell("Gain visé",gm!=null?money0(gm):"—","pos");
-    if(!o)h+=cell("Pips",p!=null?fx(p):"—",cls(p||0))+cell("R obtenu",rg!=null?fx(rg,2):"—",cls(rg||0))+cell("Durée",fmtDur(dur(t)));
+    const u=unitOf(t.p),U=u==="points"?"Points":"Pips";
+    let h=cell("Stop",rk!=null?nf(rk)+" "+u:"—")+cell("Objectif",tk!=null?nf(tk)+" "+u:"—")+cell("R:R prévu",rr!=null?"1 : "+nf(rr,2):"—")
+      +cell("Risque",rm!=null?money0(rm):"—")+cell("Risque %",rm!=null&&cap?nf(rm/cap*100,2)+" %":"—")+cell("Gain visé",gm!=null?money0(gm):"—");
+    if(!o)h+=cell(U,p!=null?fx(p):"—")+cell("R obtenu",rg!=null?fx(rg,2):"—")+cell("Durée",fmtDur(dur(t)));
     root.querySelector(".calc").innerHTML=h;
+    root.querySelector(".piprule").textContent=t.p+" : "+asset(t.p).txt;
     const ri=root.querySelector('[data-f="r"]');if(ri)ri.placeholder=es!=null?"≈ "+String(es).replace(".",","):"ex. 42,50";
   };
   root.querySelectorAll(".seg").forEach(sg=>sg.querySelectorAll("button").forEach(b=>b.onclick=()=>{t[sg.dataset.k]=b.dataset.v;sg.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));if(sg.dataset.k==="st"&&b.dataset.v==="closed"&&!t.ch){t.ch=nowHM();const c=root.querySelector('[data-f="ch"]');if(c)c.value=t.ch}upd()}));
@@ -857,6 +946,12 @@ function bindForm(root,t){
   root.querySelectorAll(".chips[data-k]").forEach(bindGroup);
   root.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{const k=b.dataset.sw;t[k]=!t[k];b.classList.toggle("on",t[k])});
   root.querySelectorAll("input,textarea").forEach(i=>i.oninput=upd);
+  const shot=()=>{const box=root.querySelector(".shotf"),has=t._imgData||(t.img&&!t._imgDel);
+    box.innerHTML=has?`<div class="shotrow"><img alt="Capture du trade"><div><button class="lnk" data-sc>Changer</button><button class="lnk neg" data-sr>Retirer</button></div></div>`:`<button class="shotadd" data-sc>${ic("image",1.8)}<span>Ajouter une capture du trade</span></button>`;
+    if(has){const im=box.querySelector("img");if(t._imgData)im.src=t._imgData;else IMG.get(t.img).then(d=>{if(d)im.src=d}).catch(()=>{});im.onclick=()=>im.src&&viewShot(im.src)}
+    box.querySelector("[data-sc]").onclick=()=>pickShot(d=>{t._imgData=d;t._imgDel=false;shot()});
+    const rm=box.querySelector("[data-sr]");if(rm)rm.onclick=()=>{t._imgData=null;t._imgDel=true;shot()}};
+  shot();
   root.querySelector('[data-f="d"]').addEventListener("change",e=>{const c=root.querySelector('[data-f="cd"]');if(c&&(!c.value||c.value<e.target.value)){c.value=e.target.value;upd()}});
   root.querySelector(".est").onclick=()=>{read();const v=estimate(t);if(v==null){toast("Il faut l'entrée, la sortie et les lots");return}root.querySelector('[data-f="r"]').value=String(v).replace(".",",");upd();toast("Calcul avec la valeur du pip de "+t.p)};
   upd();
@@ -890,6 +985,12 @@ function validate(t){
 }
 function storeTrade(t){
   if(!t.a)t.a=S.acc;
+  const before=new Set(reminders().filter(x=>x.lvl==="bad"||x.lvl==="warn"||x.lvl==="ok").map(x=>x.t));
+  setTimeout(()=>{const n=reminders().find(x=>(x.lvl==="bad"||x.lvl==="warn"||x.lvl==="ok")&&!before.has(x.t));if(n)setTimeout(()=>toast(n.t),2500)},0);
+  const old=t.id&&(S.trades.find(x=>x.id===t.id)||{}).img;
+  if(t._imgData){const k="i"+uid();IMG.set(k,t._imgData).catch(()=>toast("Capture non enregistrée"));if(old)IMG.del(old).catch(()=>{});t.img=k;if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{})}
+  else if(t._imgDel){if(old)IMG.del(old).catch(()=>{});t.img=null}
+  delete t._imgData;delete t._imgDel;
   if(t.id){const i=S.trades.findIndex(x=>x.id===t.id);if(i>=0)S.trades[i]=t}else{t.id=uid();S.trades.push(t)}
   save();renderAll();
 }
@@ -985,14 +1086,16 @@ function openTrade(id){
   const kv=(k,v)=>v==null||v===""?"":`<div class="kv"><span>${k}</span><b class="num">${v}</b></div>`;
   const when=(d,h)=>d?shortDate(d)+(h?" à "+h:""):null;
   const w=sheet(`<h2>${esc(t.p)} <span class="tag">${t.s==="sell"?"VENTE":"ACHAT"}</span></h2><div class="sub">${esc(dayLabel(t.d))}${t.h?" à "+esc(t.h):""}${t.set?" · "+esc(t.set):""}</div>
-    <div class="card pad" style="text-align:center"><div style="font-size:36px;font-weight:750;letter-spacing:-.03em" class="${o?"":cls(t.r)} num">${o?"En cours":money(t.r||0,true)}</div><div class="mut" style="font-size:14px;margin-top:2px">${[!o&&p!=null?fx(p)+" pips":"",!o&&rg!=null?fx(rg,2)+" R":"",!o&&t.ex?EXITS[t.ex]:""].filter(Boolean).join(" · ")}</div></div>
+    <div class="card pad" style="text-align:center"><div style="font-size:36px;font-weight:750;letter-spacing:-.03em" class="${o?"":cls(t.r)} num">${o?"En cours":money(t.r||0,true)}</div><div class="mut" style="font-size:14px;margin-top:2px">${[!o&&p!=null?fx(p)+" "+unitOf(t.p):"",!o&&rg!=null?fx(rg,2)+" R":"",!o&&t.ex?EXITS[t.ex]:""].filter(Boolean).join(" · ")}</div></div>
     <div class="card" style="margin-top:12px">${kv("Ouverture",when(t.d,t.h))}${o?"":kv("Fermeture",when(t.cd,t.ch))}${o?"":kv("Durée",dur(t)!=null?fmtDur(dur(t)):null)}${kv("Lots",t.l!=null?fmtP(t.l):null)}${kv("Risque",rm!=null?money(rm)+(CAP()?" · "+nf(rm/CAP()*100,2)+" %":""):null)}${t.fee?kv("Frais",money(t.fee)):""}</div>
-    <div class="card" style="margin-top:12px">${kv("Entrée",fmtP(t.e))}${kv("Stop loss",t.sl!=null?fmtP(t.sl)+(riskPips(t)!=null?" · "+nf(riskPips(t))+" pips":""):null)}${kv("Take profit",t.tp!=null?fmtP(t.tp)+(tpPips(t)!=null?" · "+nf(tpPips(t))+" pips":""):null)}${o?"":kv("Sortie",t.x!=null?fmtP(t.x):null)}${kv("R:R prévu",rr!=null?"1 : "+nf(rr,2):null)}</div>
+    <div class="card" style="margin-top:12px">${kv("Entrée",fmtP(t.e))}${kv("Stop loss",t.sl!=null?fmtP(t.sl)+(riskPips(t)!=null?" · "+nf(riskPips(t))+" "+unitOf(t.p):""):null)}${kv("Take profit",t.tp!=null?fmtP(t.tp)+(tpPips(t)!=null?" · "+nf(tpPips(t))+" "+unitOf(t.p):""):null)}${o?"":kv("Sortie",t.x!=null?fmtP(t.x):null)}${kv("R:R prévu",rr!=null?"1 : "+nf(rr,2):null)}</div>
     <div class="card" style="margin-top:12px">${kv("Psychologie",t.emo?esc(t.emo):null)}${kv("Plan respecté",t.plan?"Oui":"Non")}</div>
     ${t.n?`<div class="card" style="margin-top:12px"><div class="note">${esc(t.n)}</div></div>`:""}
+    ${t.img?`<button class="shotv" data-view aria-label="Agrandir la capture"><img alt="Capture du trade"><span>${ic("search",2)}</span></button>`:""}
     <div class="btns"><button class="btn soft" data-ed>${ic("edit")} ${o?"Clôturer / modifier":"Modifier"}</button><button class="btn danger" data-del style="width:auto;padding:0 18px" aria-label="Supprimer">${ic("trash")}</button></div>`);
   w.querySelector("[data-ed]").onclick=()=>{w._close();setTimeout(()=>openEdit(t.id,o),220)};
-  w.querySelector("[data-del]").onclick=()=>confirmSheet("Supprimer ce trade ?","Il disparaîtra de ton journal et des statistiques.","Supprimer",()=>{S.trades=S.trades.filter(x=>x.id!==t.id);save();renderAll();w._close();toast("Trade supprimé")});
+  const sv=w.querySelector("[data-view]");if(sv){const im=sv.querySelector("img");IMG.get(t.img).then(d=>{if(d)im.src=d;else sv.remove()}).catch(()=>sv.remove());sv.onclick=()=>im.src&&viewShot(im.src)}
+  w.querySelector("[data-del]").onclick=()=>confirmSheet("Supprimer ce trade ?","Il disparaîtra de ton journal et des statistiques.","Supprimer",()=>{dropImgs([t]);S.trades=S.trades.filter(x=>x.id!==t.id);save();renderAll();w._close();toast("Trade supprimé")});
 }
 function openEdit(id,closing){
   const src=S.trades.find(x=>x.id===id);if(!src)return;
@@ -1002,6 +1105,71 @@ function openEdit(id,closing){
     const get=bindForm(el.querySelector("#edF"),t);
     el.querySelector("#edSave").onclick=()=>{const x=get();if(!validate(x))return;storeTrade(x);closePush(true,false);toast("Modifications enregistrées")};
   });
+}
+
+/* ================= Rappels ================= */
+// résumé de chaque compte, pour le récap en haut des Rappels
+function snapNow(){
+  const td=today(),from=iso(new Date(dObj(td)-10*864e5)),m=ym(td);
+  return {d:td,acc:S.accounts.map(a=>{const R=rules(a),days={};let open=0,pnlM=0;
+    for(const t of S.trades){if(t.a!==a.id)continue;if(isOpen(t)){open++;continue}const k=t.cd||t.d;if(k>=from)days[k]=(days[k]||0)+t.r;if(ym(k)===m)pnlM+=t.r}
+    return {name:a.name,cur:a.cur||"€",prop:isProp(a),phase:phaseName(a),cap:+a.cap||0,tp:a.phase===1?a.t1:a.phase===2?a.t2:null,pnl:R.pnl,target:R.target,totMax:R.totMax,goal:R.prop?null:R.target,m,pnlM,days,open}})};
+}
+function recapText(snap,td){
+  const MO=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"],JO=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+  const fm=(v,c)=>(v<-.5?"−":v>.5?"+":"")+Math.round(Math.abs(v)).toLocaleString("fr-FR")+" "+c;
+  const fa=(v,c)=>Math.round(Math.abs(v)).toLocaleString("fr-FR")+" "+c;
+  const pc=v=>(Math.round(v*100)/100).toLocaleString("fr-FR")+" %";
+  const d=new Date(td+"T12:00:00"),y=new Date(d);y.setDate(y.getDate()-1);while(y.getDay()===0||y.getDay()===6)y.setDate(y.getDate()-1);
+  const yk=y.getFullYear()+"-"+String(y.getMonth()+1).padStart(2,"0")+"-"+String(y.getDate()).padStart(2,"0"),yl=y.getDate()===d.getDate()-1?"hier":JO[y.getDay()];
+  const lines=(snap&&snap.acc||[]).map(a=>{const c=a.cur,p=[];
+    if(a.prop&&a.target){const left=a.target-a.pnl;p.push(left>.5?`${pc(a.pnl/a.cap*100)} sur ${a.tp} %, il te reste ${fa(left,c)} pour valider ${a.phase.toLowerCase().replace(/^étape/,"l'étape")}`:`objectif de ${a.phase.toLowerCase().replace(/^étape/,"l'étape")} atteint`)}
+    else if(a.prop)p.push(`${fm(a.pnl,c)} (${a.phase.toLowerCase()})`);
+    const yd=a.days&&a.days[yk];p.push(yl+" "+(yd!=null?fm(yd,c):"pas de trade"));
+    if(!a.prop){const mm=a.m===td.slice(0,7)?a.pnlM:0;p.push(MO[d.getMonth()]+" "+fm(mm,c)+(a.goal?` sur ${fa(a.goal,c)} visés`:""))}
+    if(a.totMax&&-a.pnl>=a.totMax*.7)p.push(`attention, perte totale à ${Math.round(-a.pnl/a.totMax*100)} % de la limite`);
+    if(a.open)p.push(a.open+" trade"+(a.open>1?"s":"")+" en cours");
+    return a.name+" : "+p.join(", ")+"."});
+  return {title:"Ton récap",body:lines.length?lines.join("\n"):"Ouvre ton journal pour voir où tu en es."};
+}
+function reminders(){
+  const out=[],multi=S.accounts.length>1,td=today();
+  for(const a of S.accounts){
+    const R=rules(a),cur=a.cur||"€",nm=multi?a.name+" · ":"",cap=+a.cap||0;
+    const loss=(v,max,what,pctTxt)=>{if(!max)return;const u=v/max;
+      if(u>=1)out.push({lvl:"bad",a,ic:"info",t:nm+what+" atteinte",x:`Tu as perdu ${money0(v,cur)} sur ${money0(max,cur)} autorisés${pctTxt}. Arrête de trader${what.includes("jour")?" pour aujourd'hui":""}.`});
+      else if(u>=.5)out.push({lvl:u>=.8?"bad":"warn",a,ic:"info",t:nm+`Attention, tu es à ${Math.round(u*100)} % de ta ${what.toLowerCase()}`,x:`Il te reste ${money0(max-v,cur)} avant la limite${pctTxt}.`})};
+    loss(-R.dayPnl,R.dayMax,"Perte max du jour",isProp(a)&&a.dd?` (${nf(a.dd,2)} % du compte)`:"");
+    loss(-R.pnl,R.totMax,"Perte max totale",isProp(a)&&a.mdd?` (${nf(a.mdd,2)} % du compte)`:"");
+    if(R.target){const v=R.prop?R.pnl:R.pnlM,left=R.target-v,tp=R.prop?(a.phase===1?a.t1:a.t2):null;
+      if(left<=0.004)out.push({lvl:"ok",a,ic:"check",t:nm+(R.prop?`Objectif de ${phaseName(a).toLowerCase().replace(/^étape/,"l'étape")} atteint !`:"Objectif du mois atteint !"),x:R.prop?(a.phase===1&&a.ch==="two"?"Tu peux passer à l'étape 2.":"Tu peux passer en compte financé."):`Tu as fait ${money0(v,cur)} ce mois-ci pour ${money0(R.target,cur)} visés.`,act:R.prop?"next":null});
+      else out.push({lvl:"goal",a,ic:"flag",t:nm+(R.prop?`Il te reste ${money0(left,cur)} pour valider ${phaseName(a).toLowerCase().replace(/^étape/,"l'étape")}`:`Il te reste ${money0(left,cur)} pour ton objectif du mois`),
+        x:R.prop?`Soit ${nf(left/cap*100,2)} % du compte. Tu en es à ${nf(Math.max(0,v)/cap*100,2)} % sur ${nf(tp,2)} %.`:`Tu en es à ${money0(v,cur)} sur ${money0(R.target,cur)}.`,q:Math.max(0,v)/R.target})}
+    const old=S.trades.filter(t=>t.a===a.id&&isOpen(t)&&t.d<td);
+    if(old.length)out.push({lvl:"info",a,ic:"clock",t:nm+(old.length>1?old.length+" trades sont encore en cours":"Un trade est encore en cours"),x:`Ouvert${old.length>1?"s":""} depuis le ${shortDate(old.map(t=>t.d).sort()[0])}. Pense à ${old.length>1?"les":"le"} clôturer dans le journal.`,trade:old[0].id});
+    const yk=iso(new Date(dObj(td)-864e5)),bare=S.trades.filter(t=>t.a===a.id&&!isOpen(t)&&(t.cd||t.d)>=yk&&!t.n);
+    if(bare.length)out.push({lvl:"info",a,ic:"edit",t:nm+(bare.length>1?bare.length+" trades récents sans notes":"Un trade récent sans notes"),x:"Note ce qui s'est passé tant que c'est frais : c'est ça qui fait progresser.",trade:bare[0].id});
+  }
+  if(S.trades.length&&(!S.lastBackup||(Date.now()-S.lastBackup)>14*864e5))out.push({lvl:"info",ic:"save",t:"Pense à faire une sauvegarde",x:S.lastBackup?"Ta dernière date du "+shortDate(iso(new Date(S.lastBackup)))+".":"Tu n'en as encore jamais fait. Tes trades ne sont que sur ce téléphone.",act:"backup"});
+  const ord={bad:0,warn:1,ok:2,goal:3,info:4};return out.sort((x,y)=>ord[x.lvl]-ord[y.lvl]);
+}
+const alertCount=()=>reminders().filter(x=>x.lvl==="bad"||x.lvl==="warn"||x.lvl==="ok").length;
+function updateBadge(){const n=alertCount(),t=tabs[PG.rem];if(!t)return;let b=t.querySelector(".badge");if(!n){if(b)b.remove();return}if(!b){b=document.createElement("span");b.className="badge";t.appendChild(b)}b.textContent=n>9?"9+":n}
+function renderRem(){
+  const el=$("pRem"),list=reminders(),R=recapText(snapNow(),today());
+  const sec=(title,items)=>items.length?`<div class="sec">${title}</div><div class="rlist">${items.map((x,i)=>`<div class="rem ${x.lvl}" data-i="${list.indexOf(x)}"><span class="ri">${ic(x.ic,2)}</span><div class="rt"><b>${esc(x.t)}</b><small>${esc(x.x)}</small>${x.q!=null?`<div class="mt-b"><i class="g" style="width:${(Math.min(1,x.q)*100).toFixed(1)}%"></i></div>`:""}${x.act?`<button class="lnk" data-act="${x.act}">${{next:"Valider l'étape",backup:"Sauvegarder maintenant"}[x.act]}</button>`:x.trade?`<button class="lnk" data-tr="${x.trade}">Voir le trade</button>`:""}</div></div>`).join("")}</div>`:"";
+  el.innerHTML=topbar("Rappels")+`<div class="wrap"><h1 class="lt">Rappels</h1>
+    <div class="card pad recap"><div class="rh"><b>${esc(R.title)}</b><span class="phase">${esc(dayLabel(today()))}</span></div><p>${esc(R.body).replace(/\n/g,"<br>")}</p></div>
+    ${sec("Attention",list.filter(x=>x.lvl==="bad"||x.lvl==="warn"))}
+    ${sec("Objectifs",list.filter(x=>x.lvl==="ok"||x.lvl==="goal"))}
+    ${sec("À faire",list.filter(x=>x.lvl==="info"))}
+    ${!list.length?`<div class="card empty" style="margin-top:14px">${ic("bell",1.6)}<b>Rien à signaler</b>Ajoute des objectifs ou des limites à tes comptes dans les réglages pour recevoir des rappels.</div>`:""}
+  </div>`;
+  bindMenuBtns(el);
+  el.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>{const x=list[+b.closest("[data-i]").dataset.i];
+    if(b.dataset.act==="next")confirmSheet("Valider l'étape ?","Les objectifs et les pertes max repartent de zéro à partir d'aujourd'hui. Tes trades restent dans le journal.","Valider",()=>nextPhase(x.a));
+    if(b.dataset.act==="backup")exportJSON()});
+  el.querySelectorAll("[data-tr]").forEach(b=>b.onclick=()=>openTrade(b.dataset.tr));
 }
 
 /* ================= Calendrier (mois et année) ================= */
@@ -1082,14 +1250,16 @@ function renderSet(root){
   el.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{s.setups.splice(+b.dataset.rm,1);save();renderAdd();rs()});
   $("addSet").onclick=()=>askText("Nouveau setup","ex. FVG, ODB, OTE…","",n=>{if(n&&!s.setups.includes(n)){s.setups.push(n);save();renderAdd();rs()}});
   $("bExp").onclick=exportJSON;$("bImp").onclick=()=>$("fileIn").click();$("bCsv").onclick=exportCSV;
-  $("bWipe").onclick=()=>confirmSheet("Effacer ce journal ?","Tous les trades de « "+ACC().name+" » seront supprimés de ce téléphone. Pense à faire une sauvegarde avant.","Tout effacer",()=>{S.trades=S.trades.filter(t=>t.a!==S.acc);save();renderAll();toast("Journal vidé")});
+  $("bWipe").onclick=()=>confirmSheet("Effacer ce journal ?","Tous les trades de « "+ACC().name+" » seront supprimés de ce téléphone. Pense à faire une sauvegarde avant.","Tout effacer",()=>{dropImgs(S.trades.filter(t=>t.a===S.acc));S.trades=S.trades.filter(t=>t.a!==S.acc);save();renderAll();toast("Journal vidé")});
 }
 function giveFile(name,text,type){
   const blob=new Blob([text],{type});const f=new File([blob],name,{type});
   if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f]}).catch(()=>{});return}
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
 }
-function exportJSON(){giveFile("journal-"+today()+".json",JSON.stringify({app:"journal",v:2,date:new Date().toISOString(),data:S},null,1),"application/json");toast("Sauvegarde prête")}
+async function exportJSON(){
+  const images={};for(const t of S.trades)if(t.img){try{const d=await IMG.get(t.img);if(d)images[t.img]=d}catch(_){}}
+  giveFile("journal-"+today()+".json",JSON.stringify({app:"journal",v:3,date:new Date().toISOString(),data:S,images}),"application/json");S.lastBackup=Date.now();save();if(cur===PG.rem)renderRem();updateBadge();toast("Sauvegarde prête")}
 function exportCSV(){
   const H=["Compte","Date","Heure d'entrée","Date de sortie","Heure de sortie","Durée (min)","Paire","Sens","Statut","Entrée","Stop","Objectif","Sortie","Clôture","Lots","Pips","R","Risque","Résultat","Frais","Monnaie","Setup","Psychologie","Plan respecté","Notes"];
   const q=v=>{v=v==null?"":String(v);return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v},n=v=>v==null?"":String(Math.round(v*100000)/100000).replace(".",",");
@@ -1097,7 +1267,7 @@ function exportCSV(){
   const rows=sortT(S.trades).reverse().map(t=>[an(t.a).name,t.d,t.h,t.cd,t.ch,dur(t)!=null?Math.round(dur(t)):"",t.p,t.s==="sell"?"Vente":"Achat",isOpen(t)?"En cours":"Clôturé",n(t.e),n(t.sl),n(t.tp),n(t.x),t.ex?EXITS[t.ex]:"",n(t.l),n(pips(t)),n(rGot(t)),n(riskMoney(t)),n(t.r),n(t.fee),an(t.a).cur,t.set,t.emo,t.plan?"Oui":"Non",t.n].map(q).join(";"));
   giveFile("journal-"+today()+".csv","﻿"+[H.join(";"),...rows].join("\n"),"text/csv");
 }
-$("fileIn").onchange=e=>{const f=e.target.files[0];e.target.value="";if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const j=JSON.parse(rd.result),raw=j.data||j;if(!Array.isArray(raw.trades))throw 0;const d=fix(raw);confirmSheet("Restaurer cette sauvegarde ?",d.trades.length+" trade"+(d.trades.length>1?"s":"")+" et "+d.accounts.length+" compte"+(d.accounts.length>1?"s":"")+" dans le fichier. Ils remplaceront ceux du journal.","Restaurer",()=>{S.trades=d.trades;S.accounts=d.accounts;S.acc=d.acc;S.profile=d.profile;Object.assign(S.settings,d.settings);save();applyTheme();addT=blank();renderAll();closeAllPush();toast("Sauvegarde restaurée")})}catch(_){toast("Ce fichier n'est pas une sauvegarde du journal")}};rd.readAsText(f)};
+$("fileIn").onchange=e=>{const f=e.target.files[0];e.target.value="";if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const j=JSON.parse(rd.result),raw=j.data||j;if(!Array.isArray(raw.trades))throw 0;const d=fix(raw);confirmSheet("Restaurer cette sauvegarde ?",d.trades.length+" trade"+(d.trades.length>1?"s":"")+" et "+d.accounts.length+" compte"+(d.accounts.length>1?"s":"")+" dans le fichier. Ils remplaceront ceux du journal.","Restaurer",()=>{dropImgs(S.trades);Object.entries(j.images||{}).forEach(([k,v])=>IMG.set(k,v).catch(()=>{}));S.trades=d.trades;S.accounts=d.accounts;S.acc=d.acc;S.profile=d.profile;Object.assign(S.settings,d.settings);save();applyTheme();addT=blank();renderAll();closeAllPush();toast("Sauvegarde restaurée")})}catch(_){toast("Ce fichier n'est pas une sauvegarde du journal")}};rd.readAsText(f)};
 
 /* ================= thème ================= */
 const mq=matchMedia("(prefers-color-scheme: dark)");
@@ -1132,10 +1302,10 @@ function confirmSheet(title,sub,ok,fn){const w=sheet(`<h2>${esc(title)}</h2><div
 function askText(title,ph,val,fn){const w=sheet(`<h2>${esc(title)}</h2><label class="fld" style="margin-top:12px"><input data-in placeholder="${esc(ph)}" value="${esc(val)}"></label><div class="btns"><button class="btn soft" data-no>Annuler</button><button class="btn" data-ok>Ajouter</button></div>`);const i=w.querySelector("[data-in]");setTimeout(()=>i.focus(),350);const ok=()=>{const v=i.value.trim();w._close();fn(v)};w.querySelector("[data-ok]").onclick=ok;i.onkeydown=e=>{if(e.key==="Enter")ok()};w.querySelector("[data-no]").onclick=w._close}
 
 /* ================= navigation entre les pages (comme Zerly) ================= */
-const PG={home:0,trades:1,add:2,stats:3,cal:4};
+const PG={home:0,trades:1,add:2,stats:3,cal:4,rem:5};
 const pages=[...document.querySelectorAll(".page")];
 let cur=0,navAnim=0,NAVDIR=0;const NAVBACK=[],NAVFWD=[];
-function onEnter(i){if(i===PG.trades)renderTrades();if(i===PG.stats)renderStats();if(i===PG.home)renderHome();if(i===PG.cal)renderCalPage()}
+function onEnter(i){if(i===PG.trades)renderTrades();if(i===PG.stats)renderStats();if(i===PG.home)renderHome();if(i===PG.cal)renderCalPage();if(i===PG.rem)renderRem()}
 function paint(from,to,q){
   const dir=NAVDIR||(to>from?1:-1),SH="-10px 0 34px rgba(0,0,0,.28)";
   pages.forEach((p,i)=>{
@@ -1187,7 +1357,7 @@ function closeAllPush(){while(PUSH.length)closePush(false,false);$("app").style.
 /* ================= gestes (comme Zerly) =================
    - vers la droite : retour (jamais depuis l'accueil)
    - vers la gauche : en avant (l'écran qu'on vient de quitter)            */
-const NOSWIPE="input,textarea,select,.noswipe,#tabbar,.sheet";
+const NOSWIPE="input,textarea,select,.noswipe,#tabbar,.sheet,.viewer";
 function hScroller(t){for(let n=t;n&&n!==document.body;n=n.parentElement){if(!(n instanceof Element))continue;if(n.scrollWidth>n.clientWidth+2){const ox=getComputedStyle(n).overflowX;if(ox==="auto"||ox==="scroll")return n}}return null}
 function velo(h){const t=h[h.length-1][1];let i=h.length-1;while(i>0&&t-h[i-1][1]<=90)i--;const a=h[i],b=h[h.length-1];return (b[0]-a[0])/Math.max(16,b[1]-a[1])}
 let swallow=0;
@@ -1236,7 +1406,7 @@ document.addEventListener("click",e=>{if(swallow&&performance.now()-swallow<400)
 
 /* ================= barre du bas & bulle à ressort (comme Zerly) ================= */
 const tabbar=$("tabbar"),bubbleEl=$("bubble");
-const TABS=[["home","Accueil"],["list","Trades"],["plus","Nouveau trade"],["chart","Statistiques"],["cal","Calendrier"]];
+const TABS=[["home","Accueil"],["list","Trades"],["plus","Nouveau trade"],["chart","Statistiques"],["cal","Calendrier"],["bell","Rappels"]];
 TABS.forEach(([icn,l],i)=>{const b=document.createElement("button");b.className="tab";b.dataset.i=i;b.setAttribute("aria-label",l);b.innerHTML=ic(icn,icn==="plus"?2.3:1.9);tabbar.appendChild(b)});
 const tabs=[...tabbar.querySelectorAll(".tab")],PAD=5,N=tabs.length;let ITEM=62,BH=54;
 // largeur des boutons selon la largeur de l'écran
@@ -1290,8 +1460,8 @@ function demoTrades(){
 }
 
 /* ================= démarrage ================= */
-function renderAll(keepPush){renderHome();renderAdd();if(cur===PG.trades)renderTrades();if(cur===PG.stats)renderStats();if(cur===PG.cal)renderCalPage();if(!keepPush&&PUSH.length){const p=PUSH[PUSH.length-1];p.render(p.el)}}
-renderHome();renderAdd();
+function renderAll(keepPush){renderHome();renderAdd();updateBadge();if(cur===PG.trades)renderTrades();if(cur===PG.stats)renderStats();if(cur===PG.cal)renderCalPage();if(cur===PG.rem)renderRem();if(!keepPush&&PUSH.length){const p=PUSH[PUSH.length-1];p.render(p.el)}}
+renderHome();renderAdd();updateBadge();
 
 /* ================= écran d'ouverture : les bougies ================= */
 // 3 haussières, une 4e qui monte puis se fait rejeter (grande mèche) et clôture en grosse baissière,
