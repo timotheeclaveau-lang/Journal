@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Journal</title>
+<title>J.Trade</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Journal">
+<meta name="apple-mobile-web-app-title" content="J.Trade">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" id="themeColor" content="#0D0F12">
 <link rel="manifest" href="manifest.webmanifest">
@@ -36,6 +36,7 @@ html[data-theme="light"]{
   --card-shadow:0 1px 2px rgba(15,18,22,.05),0 0 0 .5px rgba(21,24,28,.06);
   --scrim:rgba(10,12,15,.34);--bar:rgba(236,237,239,.84);
   --accent:#4E6378;--pos:#2E7553;--neg:#A9473F;--pos-bg:rgba(46,117,83,.10);--neg-bg:rgba(169,71,63,.10);
+  --pos-cal:rgba(46,117,83,.30);--neg-cal:rgba(169,71,63,.30);--pos-txt:#1F5A3E;--neg-txt:#8A3029;
   color-scheme:light;
 }
 html[data-theme="dark"]{
@@ -49,6 +50,7 @@ html[data-theme="dark"]{
   --card-shadow:0 0 0 .5px rgba(233,235,238,.06);
   --scrim:rgba(0,0,0,.58);--bar:rgba(13,15,18,.80);
   --accent:#9AAABD;--pos:#7DB89A;--neg:#DB8A82;--pos-bg:rgba(125,184,154,.12);--neg-bg:rgba(219,138,130,.12);
+  --pos-cal:rgba(110,190,150,.38);--neg-cal:rgba(225,120,110,.38);--pos-txt:#CFF0DE;--neg-txt:#FFD9D4;
   color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -203,7 +205,10 @@ button.row:active,.row.tap:active{background:var(--fill)}
 .cal .c{aspect-ratio:1/1.12;border-radius:12px;background:var(--card);box-shadow:var(--card-shadow);padding:5px 4px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;font-size:13px;font-weight:600}
 .cal .c.o{background:none;box-shadow:none}
 .cal .c.td{box-shadow:inset 0 0 0 1.5px var(--accent)}
-.cal .c.p{background:var(--pos-bg)}.cal .c.n{background:var(--neg-bg)}
+.cal .c.p{background:var(--pos-cal);color:var(--pos-txt)}.cal .c.n{background:var(--neg-cal);color:var(--neg-txt)}
+.cal .c.p i,.cal .c.n i{color:inherit}
+.mc.p{background:var(--pos-cal)}.mc.n{background:var(--neg-cal)}
+.mc.p b,.mc.p small{color:var(--pos-txt)}.mc.n b,.mc.n small{color:var(--neg-txt)}
 .cal .c i{font-style:normal;font-size:10.5px;font-weight:700;white-space:nowrap}
 .cal .c.we{opacity:.55}
 
@@ -362,14 +367,15 @@ button.row:active,.row.tap:active{background:var(--fill)}
 
 /* ---------- v0.4 : captures ---------- */
 .calc b{color:var(--text)}
+.calc em{display:block;font-style:normal;font-size:11.5px;color:var(--text3);margin-top:1px}
 .piprule{margin-top:8px}
 .shotadd{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:64px;border-radius:16px;border:1.5px dashed var(--fill2);color:var(--text2);font-size:15px;font-weight:600}
 .shotadd svg{width:22px;height:22px}
 .shotrow{display:flex;align-items:center;gap:14px;background:var(--card);box-shadow:var(--card-shadow);border-radius:16px;padding:8px}
-.shotrow img{width:92px;height:64px;object-fit:cover;border-radius:11px;background:var(--fill);cursor:zoom-in}
+.shotrow img{width:92px;height:64px;object-fit:contain;border-radius:11px;background:var(--fill);cursor:zoom-in}
 .shotrow div{display:flex;gap:14px}
 .shotv{position:relative;display:block;width:100%;margin-top:12px;border-radius:16px;overflow:hidden;background:var(--fill);box-shadow:var(--card-shadow)}
-.shotv img{display:block;width:100%;height:150px;object-fit:cover}
+.shotv img{display:block;width:100%;height:auto;max-height:230px;object-fit:contain;margin:0 auto}
 .shotv span{position:absolute;right:8px;bottom:8px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.45);color:#fff}
 .shotv span svg{width:15px;height:15px}
 .viewer{position:fixed;inset:0;z-index:120;background:rgba(0,0,0,.92);display:grid;place-items:center;padding:calc(var(--safe-t) + 50px) 10px calc(var(--safe-b) + 20px);opacity:0;transition:opacity .25s}
@@ -391,11 +397,15 @@ button.row:active,.row.tap:active{background:var(--fill)}
 .rt .mt-b{margin:9px 0 2px}.rt .lnk{padding:6px 0 0;font-size:14px}
 .swr.sep{border-top:.5px solid var(--sep)}
 .tin{border:0;background:var(--fill);color:var(--text);font:inherit;font-size:16px;font-weight:600;border-radius:10px;padding:6px 10px;-webkit-appearance:none;appearance:none}
+
+/* ---------- v0.7 ---------- */
+.code{font:700 34px/1 "SF Mono",ui-monospace,Menlo,monospace;letter-spacing:.12em;text-align:center;padding:18px 0;margin:4px 0 12px;border-radius:16px;background:var(--fill);user-select:none;-webkit-user-select:none}
+.btn:disabled{opacity:.4}
 @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
 </style>
 </head>
 <body>
-<div id="splash"><div class="mk"><svg id="spSvg" aria-hidden="true"></svg><b>Journal</b></div></div>
+<div id="splash"><div class="mk"><svg id="spSvg" aria-hidden="true"></svg><b>J.Trade</b></div></div>
 
 <div id="app">
   <div id="pages">
@@ -419,7 +429,7 @@ button.row:active,.row.tap:active{background:var(--fill)}
 "use strict";
 const $=id=>document.getElementById(id);
 const KEY="journal.v1";
-const VERSION="0.6";
+const VERSION="0.8";
 
 /* ================= icônes ================= */
 const IC={
@@ -462,7 +472,9 @@ const LOGO='<svg viewBox="0 0 64 64" fill="currentColor"><line x1="14" y1="16" x
 function fix(s){
   s=s&&typeof s==="object"?s:{};
   s.trades=Array.isArray(s.trades)?s.trades:[];
-  s.settings=Object.assign({theme:"auto",pair:"EUR/USD",pairs:["EUR/USD"],setups:["Cassure","Pullback","Range","Tendance"]},s.settings||{});
+  s.settings=Object.assign({theme:"auto",unit:"pips",pair:"EUR/USD",pairs:["EUR/USD"],setups:["Cassure","Pullback","Range","Tendance"],emos:["Calme","Confiant","Patient","Stress","Fatigue","Impatient","Revenge","Overtrade","FOMO","Euphorique"]},s.settings||{});
+  if(s.settings.unitV!==2){s.settings.unit="pips";s.settings.unitV=2}
+  if(!Array.isArray(s.settings.emos))s.settings.emos=["Calme","Confiant","Patient","Stress","Fatigue","Impatient","Revenge","Overtrade","FOMO","Euphorique"];
   if(!Array.isArray(s.settings.pairs)||!s.settings.pairs.length)s.settings.pairs=["EUR/USD"];
   if(!s.settings.pairs.includes(s.settings.pair))s.settings.pairs.unshift(s.settings.pair);
   // un journal par compte (perso, prop firm…) ; l'ancien capital devient celui du premier compte
@@ -523,26 +535,44 @@ const pct=(v,d=1)=>(v*100).toLocaleString("fr-FR",{maximumFractionDigits:d})+" %
 const cls=v=>v>0.004?"pos":v<-0.004?"neg":"";
 const fx=(v,d=1)=>(v<0&&Math.abs(v)>=Math.pow(10,-d)/2?"−":"")+Math.abs(v).toLocaleString("fr-FR",{maximumFractionDigits:d});
 const nf=(v,d=1)=>v.toLocaleString("fr-FR",{maximumFractionDigits:d});
-// Taille du pip et taille d'un lot standard, actif par actif (conventions MetaTrader / prop firms) :
-//  - paires forex : 1 pip = 0,0001 (le 5e chiffre après la virgule = un dixième de pip) ; 1 lot = 100 000
-//  - paires avec le yen (USD/JPY, EUR/JPY, GBP/JPY…) : 1 pip = 0,01 ; 1 lot = 100 000
-//  - or XAU/USD : 1 pip = 0,10 $ ; 1 lot = 100 onces  → 10 $ par pip et par lot
-//  - argent XAG/USD : 1 pip = 0,01 $ ; 1 lot = 5 000 onces → 50 $ par pip et par lot
-//  - pétrole (WTI, Brent) : 1 pip = 0,01 $ ; 1 lot = 1 000 barils → 10 $ par pip et par lot
-//  - indices (US30, NAS100, SPX500, GER40…) et crypto : on compte en points (1,0) ; 1 lot = 1
+// Taille d'un point (comme MT5) et d'un pip, et taille d'un lot standard, actif par actif :
+//  - forex : 1 point = 0,00001 (dernier chiffre affiché par MT5) ; 1 pip = 0,0001 = 10 points ; 1 lot = 100 000
+//  - paires avec le yen : 1 point = 0,001 ; 1 pip = 0,01 ; 1 lot = 100 000
+//  - or XAU/USD : 1 point = 0,01 ; 1 pip = 0,10 ; 1 lot = 100 onces
+//  - argent XAG/USD : 1 point = 0,001 ; 1 pip = 0,01 ; 1 lot = 5 000 onces
+//  - pétrole : 1 point = 0,01 = 1 pip ; 1 lot = 1 000 barils
+//  - indices et crypto : on compte en points de 1,0 ; 1 lot = 1
 const IDX=/NAS|US30|US100|US500|SPX|USTEC|DJ30|GER|DAX|DE40|UK100|FTSE|JP225|NIKKEI|FRA40|CAC|EU50|STOXX|HK50|AUS200|BTC|ETH|SOL|XRP|LTC/i;
 function asset(p){
   const P=(p||"").toUpperCase().replace(/\s/g,"");
-  if(/XAU|GOLD/.test(P))return {pip:.1,size:100,unit:"pips",q:"USD",txt:"1 pip = 0,10 sur le prix (ex. 2650,00 → 2650,10)"};
-  if(/XAG|SILVER/.test(P))return {pip:.01,size:5000,unit:"pips",q:"USD",txt:"1 pip = 0,01 sur le prix (ex. 31,50 → 31,51)"};
-  if(/OIL|WTI|BRENT|XTI|XBR/.test(P))return {pip:.01,size:1000,unit:"pips",q:"USD",txt:"1 pip = 0,01 sur le prix"};
-  if(IDX.test(P)){const q=/GER|DAX|DE40|FRA40|CAC|EU50|STOXX/.test(P)?"EUR":/UK100|FTSE/.test(P)?"GBP":/JP225|NIKKEI/.test(P)?"JPY":/HK50/.test(P)?"HKD":/AUS200/.test(P)?"AUD":"USD";return {pip:1,size:1,unit:"points",q,txt:"1 point = 1,0 sur le prix"}}
+  if(/XAU|GOLD/.test(P))return {pip:.1,pt:.01,size:100,q:"USD",ex:["2650,00","2650,01","2650,10"]};
+  if(/XAG|SILVER/.test(P))return {pip:.01,pt:.001,size:5000,q:"USD",ex:["31,500","31,501","31,510"]};
+  if(/OIL|WTI|BRENT|XTI|XBR/.test(P))return {pip:.01,pt:.01,size:1000,q:"USD",ex:["70,00","70,01","70,01"]};
+  if(IDX.test(P)){const q=/GER|DAX|DE40|FRA40|CAC|EU50|STOXX/.test(P)?"EUR":/UK100|FTSE/.test(P)?"GBP":/JP225|NIKKEI/.test(P)?"JPY":/HK50/.test(P)?"HKD":/AUS200/.test(P)?"AUD":"USD";return {pip:1,pt:1,size:1,q,idx:true}}
   const q=P.includes("/")?P.split("/")[1]:P.slice(3,6)||"USD";
-  if(/JPY/.test(P))return {pip:.01,size:100000,unit:"pips",q,txt:"1 pip = 0,01 (ex. 150,25 → 150,26)"};
-  return {pip:.0001,size:100000,unit:"pips",q,txt:"1 pip = 0,0001 (ex. 1,0850 → 1,0851). Le 5e chiffre après la virgule est un dixième de pip."};
+  if(/JPY/.test(P))return {pip:.01,pt:.001,size:100000,q,ex:["150,250","150,251","150,260"]};
+  return {pip:.0001,pt:.00001,size:100000,q,ex:["1,08500","1,08501","1,08510"]};
 }
-const pipSize=p=>asset(p).pip;
-const unitOf=p=>asset(p).unit;
+// S.settings.unit : "points" (comme le réticule de MT5, par défaut) ou "pips"
+const inPts=()=>S.settings.unit==="points";
+const pipSize=p=>{const a=asset(p);return inPts()?a.pt:a.pip};
+const unitOf=p=>asset(p).idx||inPts()?"points":"pips";
+function unitTxt(p){const a=asset(p);if(a.idx)return "1 point = 1,0 sur le prix.";
+  return inPts()?`1 point = ${String(a.pt).replace(".",",")} (comme MT5) : ${a.ex[0]} → ${a.ex[1]} = 1 point.${a.pt!==a.pip?" 10 points = 1 pip.":""}`:`1 pip = ${String(a.pip).replace(".",",")} : ${a.ex[0]} → ${a.ex[2]} = 1 pip${a.pt!==a.pip?" = 10 points sur MT5":""}.`}
+// « 0,6 pip », « 6,7 pips »
+const uL=(p,v)=>{const u=unitOf(p);return Math.abs(v)<2?u.slice(0,-1):u};
+// équivalent en points de MT5, quand on compte en pips
+function ptsOf(p,v){const a=asset(p);if(inPts()||a.idx||a.pip===a.pt||v==null)return "";const n=Math.round(v*a.pip/a.pt);return n+" point"+(Math.abs(n)>=2?"s":"")}
+const SYM={USD:"$",EUR:"€",GBP:"£",JPY:"¥",CHF:"CHF",CAD:"CAD",AUD:"AUD",NZD:"NZD",HKD:"HKD"};
+// la valeur d'un pip expliquée : par lot, pour tes lots, et convertie dans la monnaie du compte
+function pipInfo(t){
+  const a=asset(t.p),u=unitOf(t.p).slice(0,-1),one=pipSize(t.p)*a.size,qs=SYM[a.q]||a.q,acc=CUR(),accCode=acc==="€"?"EUR":acc==="£"?"GBP":acc==="CHF"?"CHF":"USD";
+  const pv=pipValue(t,t.e),fmt=(v,c)=>v.toLocaleString("fr-FR",{maximumFractionDigits:2})+" "+c;
+  let txt=`Valeur : 1 ${u} = ${fmt(one,qs)} par lot`;
+  if(a.q!==accCode)txt+=` (≈ ${fmt(pv,acc)})`;
+  if(t.l&&t.l!==1)txt+=`, soit ${fmt(pv*t.l,acc)} pour ${nf(t.l,2)} lot${t.l>=2?"s":""}`;
+  return txt+".";
+}
 const isOpen=t=>t.st==="open";
 const sgn=t=>t.s==="sell"?-1:1;
 // arrondi au dixième pour éviter les 24,9999999 dus aux calculs de l'ordinateur
@@ -562,14 +592,15 @@ function usdPer(c,t,price){
   let v=lastPx(c+"/USD");if(v)return v;v=lastPx("USD/"+c);if(v)return 1/v;
   if(FXD[c+"USD"])return FXD[c+"USD"];if(FXD["USD"+c])return 1/FXD["USD"+c];return 1;
 }
-// valeur d'un pip (ou d'un point) pour 1 lot, dans la monnaie du compte
+// valeur d'un point (ou d'un pip) pour 1 lot, dans la monnaie du compte
 function pipValue(t,price){
-  const a=asset(t.p),inQuote=a.pip*a.size,usd=inQuote*usdPer(a.q,t,price),c=CUR()==="€"?"EUR":CUR()==="£"?"GBP":CUR()==="CHF"?"CHF":"USD";
+  const a=asset(t.p),inQuote=pipSize(t.p)*a.size,usd=inQuote*usdPer(a.q,t,price),c=CUR()==="€"?"EUR":CUR()==="£"?"GBP":CUR()==="CHF"?"CHF":"USD";
   return usd/usdPer(c,t,price);
 }
 function estimate(t){const p=pips(t);if(p==null||!t.l)return null;return Math.round(p*t.l*pipValue(t)*100)/100}
-function riskMoney(t){const r=riskPips(t);return r!=null&&t.l?r*t.l*pipValue(t,t.e):null}
-function gainMoney(t){const g=tpPips(t);return g!=null&&t.l?g*t.l*pipValue(t,t.tp):null}
+function realPV(t){if(isOpen(t)||t.r==null||!t.l||t.ex==="BE")return null;const p=pips(t);if(p==null||Math.abs(p)<3)return null;const v=(t.r+(t.fee||0))/(p*t.l);return v>0?v:null}
+function riskMoney(t){const r=riskPips(t);if(r==null||!t.l)return null;const pv=realPV(t)||pipValue(t,t.e);return r*t.l*pv}
+function gainMoney(t){const g=tpPips(t);if(g==null||!t.l)return null;const pv=realPV(t)||pipValue(t,t.tp);return g*t.l*pv}
 const tdate=(d,h)=>new Date(d+"T"+(h||"00:00")+":00");
 function dur(t){if(isOpen(t)||!t.cd||!t.h||!t.ch)return null;const m=(tdate(t.cd,t.ch)-tdate(t.d,t.h))/60000;return m>=0?m:null}
 function fmtDur(m){if(m==null)return "—";m=Math.round(m);if(m<60)return m+" min";if(m<1440){const h=Math.floor(m/60),r=m%60;return h+" h"+(r?" "+String(r).padStart(2,"0"):"")}const j=Math.floor(m/1440),h=Math.round((m%1440)/60);return j+" j"+(h?" "+h+" h":"")}
@@ -582,16 +613,16 @@ const key=t=>t.d+(t.h||"");
 const sortT=a=>a.slice().sort((x,y)=>key(y).localeCompare(key(x)));
 const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
 function stats(list){
-  const c=list.filter(t=>!isOpen(t)),w=c.filter(t=>t.r>0),l=c.filter(t=>t.r<0);
-  const gw=w.reduce((s,t)=>s+t.r,0),gl=-l.reduce((s,t)=>s+t.r,0),net=gw-gl;
+  const c=list.filter(t=>!isOpen(t)),w=c.filter(t=>t.r>0&&t.ex!=="BE"),l=c.filter(t=>t.r<0&&t.ex!=="BE");
+  const gw=c.reduce((s,t)=>s+(t.r>0?t.r:0),0),gl=-c.reduce((s,t)=>s+(t.r<0?t.r:0),0),net=gw-gl,sw=w.reduce((s,t)=>s+t.r,0),sl=-l.reduce((s,t)=>s+t.r,0);
   const rs=c.map(rGot).filter(v=>v!=null);
   const asc=c.slice().sort((a,b)=>key(a).localeCompare(key(b)));
-  let best=0,cw=0,bl=0,cl=0;for(const t of asc){if(t.r>0){cw++;cl=0}else if(t.r<0){cl++;cw=0}best=Math.max(best,cw);bl=Math.max(bl,cl)}
+  let best=0,cw=0,bl=0,cl=0;for(const t of asc){if(t.ex==="BE")continue;if(t.r>0){cw++;cl=0}else if(t.r<0){cl++;cw=0}best=Math.max(best,cw);bl=Math.max(bl,cl)}
   // plus grosse baisse depuis un sommet (drawdown)
   let eq=CAP(),peak=eq,dd=0,ddp=0;for(const t of asc){eq+=t.r;if(eq>peak)peak=eq;const d=peak-eq;if(d>dd){dd=d;ddp=peak?d/peak:0}}
   const days={};c.forEach(t=>{const k=t.cd||t.d;days[k]=(days[k]||0)+t.r});const dv=Object.values(days);
   const dm=x=>x.map(dur).filter(v=>v!=null),rk=c.map(t=>{const m=riskMoney(t);return m!=null&&CAP()?m/CAP():null}).filter(v=>v!=null);
-  return {n:c.length,open:list.length-c.length,w:w.length,l:l.length,net,gw,gl,wr:c.length?w.length/c.length:0,pf:gl?gw/gl:w.length?Infinity:0,avgW:w.length?gw/w.length:0,avgL:l.length?gl/l.length:0,
+  return {n:c.length,open:list.length-c.length,w:w.length,l:l.length,net,gw,gl,wr:c.length?w.length/c.length:0,pf:gl?gw/gl:w.length?Infinity:0,avgW:w.length?sw/w.length:0,avgL:l.length?sl/l.length:0,
     r:avg(rs),rW:avg(w.map(rGot).filter(v=>v!=null)),rL:avg(l.map(rGot).filter(v=>v!=null)),rr:avg(c.map(rrPlan).filter(v=>v!=null)),
     max:c.length?Math.max(...c.map(t=>t.r||0)):0,min:c.length?Math.min(...c.map(t=>t.r||0)):0,
     plan:c.filter(t=>t.plan).length,streakW:best,streakL:bl,exp:c.length?net/c.length:0,dd,ddp,
@@ -652,7 +683,7 @@ function nextPhase(a){a.phase=a.phase===1&&a.ch==="two"?2:3;a.phaseStart=today()
 let toastT;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2300)}
 function tradeRow(t,opts={}){
   const o=isOpen(t),p=pips(t),r=rGot(t);
-  const sub=[t.h||"",t.set||"",p!=null&&!o?fx(p)+" "+unitOf(t.p):"",o?"En cours":""].filter(Boolean).join(" · ");
+  const sub=[t.h||"",t.set||"",p!=null&&!o?fx(p)+" "+uL(t.p,p):"",o?"En cours":""].filter(Boolean).join(" · ");
   const right=o?`<b class="mut">—</b><small>${t.e!=null?"à "+String(t.e).replace(".",","):""}</small>`:`<b class="${cls(t.r)} num">${money(t.r||0,true)}</b><small class="num">${r!=null?fx(r,2)+" R":opts.date?esc(dayLabel(t.d)):""}</small>`;
   return `<button class="row" data-trade="${t.id}"><div class="dir ${o?"open":t.s}">${ic(t.s==="sell"?"down":"up",2.1)}</div><div class="ti"><b>${esc(t.p)}<span class="tag">${t.s==="sell"?"VENTE":"ACHAT"}</span></b><small>${esc(opts.date?dayLabel(t.d)+(sub?" · "+sub:""):sub)||"&nbsp;"}</small></div><div class="rv">${right}</div></button>`;
 }
@@ -685,6 +716,7 @@ function renderHome(){
   el.innerHTML=topbar("Accueil",{hello:true})+`<div class="wrap">
     <div class="hdate">${esc(dl)}</div>
     ${accPill()}
+    ${open.length?`<div class="sec" style="margin-top:4px">En cours</div><div class="card" style="margin-bottom:14px">${open.map(t=>tradeRow(t,{date:true})).join("")}</div>`:""}
     ${all.some(t=>t.demo)?`<div class="demo"><span>Ce sont des trades d'exemple pour voir à quoi ça ressemble.</span><button id="demoOff">Effacer</button></div>`:""}
     <div class="hero">
       <div class="lbl"><span>${esc(monthLabel(mk))}</span><span class="mnav"><button data-m="-1" aria-label="Mois d'avant">${ic("back",2.2)}</button><button data-m="1" aria-label="Mois d'après">${ic("next",2.2)}</button></span></div>
@@ -698,7 +730,6 @@ function renderHome(){
       <div class="tile"><small>${isProp(a)?"Solde":"Capital"}</small><b class="num${money(capNow).length>10?" sm":""}">${money(capNow)}</b><em class="${cls(capPct)}">${fx(capPct*100,2)} % depuis le début</em></div>
       <div class="tile"><small>Gains / pertes</small><b class="num"><span class="pos">${st.w}</span> <span class="mut">/</span> <span class="neg">${st.l}</span></b><em>ce mois-ci</em></div>
     </div>
-    ${open.length?`<div class="sec">En cours</div><div class="card">${open.map(t=>tradeRow(t,{date:true})).join("")}</div>`:""}
     <div class="sec">Derniers trades ${all.length?'<a data-go="1">Tout voir</a>':""}</div>
     ${last.length?`<div class="card">${last.map(t=>tradeRow(t,{date:true})).join("")}</div>`:`<div class="card empty">${ic("book",1.6)}<b>Ce journal est vide</b>Ajoute ton premier trade avec le bouton + en bas.<div class="btns"><button class="btn soft" id="demoOn">Voir avec des exemples</button></div></div>`}
   </div>`;
@@ -756,7 +787,7 @@ function editAccount(id){
       </div>
     </div>
     <div class="btns"><button class="btn" data-ok>Enregistrer</button></div>
-    ${id&&S.accounts.length>1?`<button class="lnk neg" data-del>Supprimer ce compte</button>`:""}`);
+    ${id?`<div class="btns"><button class="btn danger" data-del>${ic("trash")} Supprimer ce compte</button></div>`:""}`);
   const q=s2=>w.querySelector(s2);
   const phases=()=>f.ch==="instant"?[[3,"Financé"]]:f.ch==="one"?[[1,"Étape 1"],[3,"Financé"]]:[[1,"Étape 1"],[2,"Étape 2"],[3,"Financé"]];
   const paint=()=>{
@@ -786,7 +817,29 @@ function editAccount(id){
     if(!id){S.accounts.push(o);S.acc=o.id;addT=blank()}
     save();renderAll();w._close();toast(id?"Compte modifié":"Compte créé");
   };
-  const del=q("[data-del]");if(del)del.onclick=()=>confirmSheet("Supprimer « "+a.name+" » ?",n?"Ses "+n+" trade"+(n>1?"s":"")+" seront supprimés aussi. Pense à faire une sauvegarde avant.":"Ce compte n'a aucun trade.","Supprimer",()=>{dropImgs(S.trades.filter(t=>t.a===a.id));S.trades=S.trades.filter(t=>t.a!==a.id);S.accounts=S.accounts.filter(x=>x.id!==a.id);if(S.acc===a.id)S.acc=S.accounts[0].id;addT=blank();save();renderAll();w._close();toast("Compte supprimé")});
+  const del=q("[data-del]");if(del)del.onclick=()=>deleteAccount(a,n,()=>w._close());
+}
+
+// supprimer un compte : une question, puis un code à 8 chiffres à recopier (impossible de le faire par erreur)
+function deleteAccount(a,n,done){
+  const w1=sheet(`<h2>Voulez-vous vraiment supprimer ce compte ?</h2><div class="sub">« ${esc(a.name)} »${n?" et ses "+n+" trade"+(n>1?"s":""):""} seront effacés de ce téléphone. Pense à faire une sauvegarde avant.</div>
+    <div class="btns"><button class="btn soft" data-no>Non</button><button class="btn danger" data-yes>Oui</button></div>`);
+  w1.querySelector("[data-no]").onclick=w1._close;
+  w1.querySelector("[data-yes]").onclick=()=>{w1._close();setTimeout(()=>{
+    const code=String(Math.floor(1e7+Math.random()*9e7));
+    const w2=sheet(`<h2>Recopie ce code</h2><div class="sub">Pour confirmer la suppression de « ${esc(a.name)} ».</div>
+      <div class="code">${code.slice(0,4)} ${code.slice(4)}</div>
+      <label class="fld"><small>Code à 8 chiffres</small><input data-in inputmode="numeric" autocomplete="off" maxlength="9" placeholder="00000000"></label>
+      <div class="btns"><button class="btn soft" data-no>Annuler</button><button class="btn danger" data-ok disabled>Supprimer</button></div>`);
+    const inp=w2.querySelector("[data-in]"),ok=w2.querySelector("[data-ok]");
+    inp.oninput=()=>{ok.disabled=inp.value.replace(/\D/g,"")!==code};
+    w2.querySelector("[data-no]").onclick=w2._close;
+    ok.onclick=()=>{if(inp.value.replace(/\D/g,"")!==code)return;
+      dropImgs(S.trades.filter(t=>t.a===a.id));S.trades=S.trades.filter(t=>t.a!==a.id);S.accounts=S.accounts.filter(x=>x.id!==a.id);
+      if(!S.accounts.length)S.accounts.push({id:uid(),name:"Compte réel",type:"real",cap:10000,cur:"€"});
+      if(!S.accounts.some(x=>x.id===S.acc))S.acc=S.accounts[0].id;
+      addT=blank();save();renderAll();w2._close();done&&done();toast("Compte supprimé")};
+  },300)};
 }
 
 /* ================= Profil & photo (comme Zerly) ================= */
@@ -861,7 +914,7 @@ function renderTradeList(){
 }
 
 /* ================= Formulaire (nouveau trade / modifier) ================= */
-const EMOS=["Calme","Confiant","Patient","Stress","Fatigue","Impatient","Revenge","Overtrade","FOMO","Euphorique"];
+const EMOS=()=>S.settings.emos;
 const PAIR_IDEAS=["XAU/USD","GBP/USD","AUD/USD","USD/JPY","USD/CAD","NZD/USD","USD/CHF","EUR/GBP","EUR/JPY","GBP/JPY","XAG/USD","NAS100","US30","GER40","BTC/USD"];
 function blank(){return {id:null,a:S.acc,p:S.settings.pair,s:"buy",st:"closed",d:today(),h:"",cd:today(),ch:nowHM(),e:null,sl:null,tp:null,x:null,l:null,r:null,fee:null,ex:"",set:"",emo:"",plan:true,n:""}}
 function chipsInner(k,t){
@@ -869,7 +922,7 @@ function chipsInner(k,t){
   if(k==="p"){const ps=S.settings.pairs.slice();if(t.p&&!ps.includes(t.p))ps.push(t.p);return ps.map(x=>ch(x,t.p===x)).join("")+'<button class="chip add" data-add="p">+ Paire</button>'}
   if(k==="set"){const ss=S.settings.setups.slice();if(t.set&&!ss.includes(t.set))ss.push(t.set);return ss.map(x=>ch(x,t.set===x)).join("")+'<button class="chip add" data-add="set">+ Setup</button>'}
   if(k==="ex")return Object.keys(EXITS).map(x=>ch(x,t.ex===x,EXITS[x])).join("");
-  const es=EMOS.slice();if(t.emo&&!es.includes(t.emo))es.push(t.emo);return es.map(x=>ch(x,t.emo===x)).join("");
+  const es=EMOS().slice();if(t.emo&&!es.includes(t.emo))es.push(t.emo);return es.map(x=>ch(x,t.emo===x)).join("")+'<button class="chip add" data-add="emo">+ Émotion</button>';
 }
 function formHTML(t){
   const v=x=>x==null?"":String(x).replace(".",",");
@@ -921,27 +974,31 @@ function formHTML(t){
 function bindForm(root,t){
   const NUMS=["e","sl","tp","x","l","r","fee"];
   const read=()=>{root.querySelectorAll("[data-f]").forEach(i=>{const k=i.dataset.f;t[k]=NUMS.includes(k)?num(i.value):i.value.trim()});if(!t.p)t.p=S.settings.pair;if(t.fee!=null)t.fee=Math.abs(t.fee)};
-  const exAuto=()=>{if(t.exHand||t.x==null||t.e==null)return;const ps=pipSize(t.p)/2;let e="";
+  if(t.ex)t.exHand=true; // un choix déjà fait (ex. Break-even) n'est jamais remplacé
+  const exAuto=()=>{if(t.exHand||t.x==null||t.e==null)return;const ps=asset(t.p).pip/2;let e="";
     if(t.tp!=null&&Math.abs(t.x-t.tp)<=ps)e="TP";else if(t.sl!=null&&Math.abs(t.x-t.sl)<=ps)e="SL";else if(Math.abs(t.x-t.e)<=ps)e="BE";else e="Manuel";
     if(e!==t.ex){t.ex=e;root.querySelectorAll('.chips[data-k="ex"] .chip').forEach(x=>x.classList.toggle("on",x.dataset.v===e))}};
-  const cell=(l,v,c="")=>`<div><small>${l}</small><b class="num ${c}">${v}</b></div>`;
+  const cell=(l,v,c="",sub="")=>`<div><small>${l}</small><b class="num ${c}">${v}</b>${sub?`<em>${sub}</em>`:""}</div>`;
   const upd=()=>{read();exAuto();
+    if(t.ex==="BE"&&t.x==null&&t.e!=null)t.x=t.e; // break-even sans prix de sortie : sortie au prix d'entrée
     const o=t.st==="open";root.querySelectorAll(".xo").forEach(x=>x.style.display=o?"none":"");
     const rk=riskPips(t),tk=tpPips(t),rr=rrPlan(t),rm=riskMoney(t),gm=gainMoney(t),p=pips(t),rg=rGot(t),es=estimate(t),cap=CAP();
     const u=unitOf(t.p),U=u==="points"?"Points":"Pips";
-    let h=cell("Stop",rk!=null?nf(rk)+" "+u:"—")+cell("Objectif",tk!=null?nf(tk)+" "+u:"—")+cell("R:R prévu",rr!=null?"1 : "+nf(rr,2):"—")
+    let h=cell("Stop",rk!=null?nf(rk)+" "+uL(t.p,rk):"—","",ptsOf(t.p,rk))+cell("Objectif",tk!=null?nf(tk)+" "+uL(t.p,tk):"—","",ptsOf(t.p,tk))+cell("R:R prévu",rr!=null?"1 : "+nf(rr,2):"—")
       +cell("Risque",rm!=null?money0(rm):"—")+cell("Risque %",rm!=null&&cap?nf(rm/cap*100,2)+" %":"—")+cell("Gain visé",gm!=null?money0(gm):"—");
-    if(!o)h+=cell(U,p!=null?fx(p):"—")+cell("R obtenu",rg!=null?fx(rg,2):"—")+cell("Durée",fmtDur(dur(t)));
+    if(!o)h+=cell(U,p!=null?fx(p):"—","",ptsOf(t.p,p))+cell("R obtenu",rg!=null?fx(rg,2):"—")+cell("Durée",fmtDur(dur(t)));
     root.querySelector(".calc").innerHTML=h;
-    root.querySelector(".piprule").textContent=t.p+" : "+asset(t.p).txt;
+    root.querySelector(".piprule").textContent=t.p+" : "+unitTxt(t.p)+" "+pipInfo(t);
     const ri=root.querySelector('[data-f="r"]');if(ri)ri.placeholder=es!=null?"≈ "+String(es).replace(".",","):"ex. 42,50";
   };
   root.querySelectorAll(".seg").forEach(sg=>sg.querySelectorAll("button").forEach(b=>b.onclick=()=>{t[sg.dataset.k]=b.dataset.v;sg.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));if(sg.dataset.k==="st"&&b.dataset.v==="closed"&&!t.ch){t.ch=nowHM();const c=root.querySelector('[data-f="ch"]');if(c)c.value=t.ch}upd()}));
   const bindGroup=cg=>{const k=cg.dataset.k;
-    cg.querySelectorAll(".chip[data-v]").forEach(b=>b.onclick=()=>{t[k]=k==="p"?b.dataset.v:t[k]===b.dataset.v?"":b.dataset.v;if(k==="ex")t.exHand=!!t[k];cg.querySelectorAll(".chip[data-v]").forEach(x=>x.classList.toggle("on",x.dataset.v===t[k]));upd()});
+    cg.querySelectorAll(".chip[data-v]").forEach(b=>b.onclick=()=>{t[k]=k==="p"?b.dataset.v:t[k]===b.dataset.v?"":b.dataset.v;if(k==="ex"){t.exHand=!!t[k];if(t[k]==="BE"){const xi=root.querySelector('[data-f="x"]');if(xi&&!xi.value&&t.e!=null)xi.value=String(t.e).replace(".",",")}}cg.querySelectorAll(".chip[data-v]").forEach(x=>x.classList.toggle("on",x.dataset.v===t[k]));upd()});
     const add=cg.querySelector("[data-add]");if(add)add.onclick=()=>{
       const done=v=>{if(!v)return;t[k]=v;cg.innerHTML=chipsInner(k,t);bindGroup(cg);upd()};
-      if(k==="p")addPair(done);else askText("Nouveau setup","ex. FVG, ODB, OTE…","",n=>{if(n&&!S.settings.setups.includes(n)){S.settings.setups.push(n);save()}done(n)});
+      if(k==="p")addPair(done);
+      else if(k==="emo")askText("Nouvelle émotion","ex. Confiance, Peur…","",n=>{if(n&&!S.settings.emos.includes(n)){S.settings.emos.push(n);save()}done(n)});
+      else askText("Nouveau setup","ex. FVG, ODB, OTE…","",n=>{if(n&&!S.settings.setups.includes(n)){S.settings.setups.push(n);save()}done(n)});
     }};
   root.querySelectorAll(".chips[data-k]").forEach(bindGroup);
   root.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{const k=b.dataset.sw;t[k]=!t[k];b.classList.toggle("on",t[k])});
@@ -977,6 +1034,8 @@ function validate(t){
   if(t.st!=="open"){
     if(!t.cd)t.cd=t.d;
     if(t.cd<t.d){toast("La fermeture est avant l'ouverture");return false}
+    if(t.ex==="BE"&&t.x==null&&t.e!=null)t.x=t.e;
+    if(t.r==null&&t.ex==="BE")t.r=-(t.fee||0);
     if(t.r==null){const v=estimate(t);if(v==null){toast("Indique le résultat ou le prix de sortie et les lots");return false}t.r=v}
   }
   if(t.st==="open"){t.x=null;t.r=null;t.cd="";t.ch="";t.ex=""}
@@ -1011,7 +1070,7 @@ function barsHTML(rows){const mx=Math.max(1,...rows.map(r=>Math.abs(r[1])));retu
 function group(list,keyf){const m={};list.filter(t=>!isOpen(t)).forEach(t=>{const k=keyf(t);if(k==null||k==="")return;(m[k]=m[k]||[]).push(t)});return m}
 function renderStats(){
   const el=$("pStats"),list=TR().filter(inPer),st=stats(list),c=2*Math.PI*40,cl=list.filter(t=>!isOpen(t));
-  const sum=a=>a.reduce((s,t)=>s+t.r,0),wr=a=>a.length?a.filter(t=>t.r>0).length/a.length:0;
+  const sum=a=>a.reduce((s,t)=>s+t.r,0),wr=a=>a.length?a.filter(t=>t.r>0&&t.ex!=="BE").length/a.length:0;
   const sub=a=>`${a.length} trade${a.length>1?"s":""} · ${pct(wr(a),0)}`;
   const rows=(m,order)=>{const ks=order?order.filter(k=>m[k]):Object.keys(m).sort((x,y)=>sum(m[y])-sum(m[x]));return ks.map(k=>[k,sum(m[k]),sub(m[k])])};
   const lbl=(m,f)=>Object.fromEntries(Object.entries(m).map(([k,v])=>[f(k),v]));
@@ -1030,7 +1089,7 @@ function renderStats(){
     <div class="card pad"><div style="font-size:34px;font-weight:750;letter-spacing:-.03em" class="${cls(st.net)} num">${money(st.net,true)}</div><div class="mut" style="font-size:14px;margin-top:2px">${st.n} trade${st.n>1?"s":""} clôturé${st.n>1?"s":""}${st.open?" · "+st.open+" en cours":""} · ${fx(CAP()?st.net/CAP()*100:0,2)} % du capital</div><div style="margin-top:12px">${curveSVG(cumul(list))}</div></div>
     <div class="sec">Réussite</div>
     <div class="card pad"><div class="ringw"><svg class="ring" viewBox="0 0 96 96"><circle class="bgc" cx="48" cy="48" r="40"/><circle class="fgc" cx="48" cy="48" r="40" stroke-dasharray="${(st.wr*c).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 48 48)"/><text x="48" y="49" text-anchor="middle" dominant-baseline="middle">${pct(st.wr,0)}</text></svg>
-      <ul><li>Gagnants <b class="pos">${st.w}</b></li><li>Perdants <b class="neg">${st.l}</b></li><li>À zéro <b>${st.n-st.w-st.l}</b></li><li>Plan respecté <b>${pct(st.plan/st.n,0)}</b></li></ul></div></div>
+      <ul><li>Gagnants <b class="pos">${st.w}</b></li><li>Perdants <b class="neg">${st.l}</b></li><li>Break-even / à zéro <b>${st.n-st.w-st.l}</b></li><li>Plan respecté <b>${pct(st.plan/st.n,0)}</b></li></ul></div></div>
     <div class="sec">Chiffres clés</div>
     <div class="tiles">
       ${tile("Profit factor",st.pf===Infinity?"∞":nf(st.pf,2),"gains ÷ pertes")}
@@ -1086,9 +1145,9 @@ function openTrade(id){
   const kv=(k,v)=>v==null||v===""?"":`<div class="kv"><span>${k}</span><b class="num">${v}</b></div>`;
   const when=(d,h)=>d?shortDate(d)+(h?" à "+h:""):null;
   const w=sheet(`<h2>${esc(t.p)} <span class="tag">${t.s==="sell"?"VENTE":"ACHAT"}</span></h2><div class="sub">${esc(dayLabel(t.d))}${t.h?" à "+esc(t.h):""}${t.set?" · "+esc(t.set):""}</div>
-    <div class="card pad" style="text-align:center"><div style="font-size:36px;font-weight:750;letter-spacing:-.03em" class="${o?"":cls(t.r)} num">${o?"En cours":money(t.r||0,true)}</div><div class="mut" style="font-size:14px;margin-top:2px">${[!o&&p!=null?fx(p)+" "+unitOf(t.p):"",!o&&rg!=null?fx(rg,2)+" R":"",!o&&t.ex?EXITS[t.ex]:""].filter(Boolean).join(" · ")}</div></div>
+    <div class="card pad" style="text-align:center"><div style="font-size:36px;font-weight:750;letter-spacing:-.03em" class="${o?"":cls(t.r)} num">${o?"En cours":money(t.r||0,true)}</div><div class="mut" style="font-size:14px;margin-top:2px">${[!o&&p!=null?fx(p)+" "+uL(t.p,p)+(ptsOf(t.p,p)?" ("+ptsOf(t.p,p)+")":""):"",!o&&rg!=null?fx(rg,2)+" R":"",!o&&t.ex?EXITS[t.ex]:""].filter(Boolean).join(" · ")}</div></div>
     <div class="card" style="margin-top:12px">${kv("Ouverture",when(t.d,t.h))}${o?"":kv("Fermeture",when(t.cd,t.ch))}${o?"":kv("Durée",dur(t)!=null?fmtDur(dur(t)):null)}${kv("Lots",t.l!=null?fmtP(t.l):null)}${kv("Risque",rm!=null?money(rm)+(CAP()?" · "+nf(rm/CAP()*100,2)+" %":""):null)}${t.fee?kv("Frais",money(t.fee)):""}</div>
-    <div class="card" style="margin-top:12px">${kv("Entrée",fmtP(t.e))}${kv("Stop loss",t.sl!=null?fmtP(t.sl)+(riskPips(t)!=null?" · "+nf(riskPips(t))+" "+unitOf(t.p):""):null)}${kv("Take profit",t.tp!=null?fmtP(t.tp)+(tpPips(t)!=null?" · "+nf(tpPips(t))+" "+unitOf(t.p):""):null)}${o?"":kv("Sortie",t.x!=null?fmtP(t.x):null)}${kv("R:R prévu",rr!=null?"1 : "+nf(rr,2):null)}</div>
+    <div class="card" style="margin-top:12px">${kv("Entrée",fmtP(t.e))}${kv("Stop loss",t.sl!=null?fmtP(t.sl)+(riskPips(t)!=null?" · "+nf(riskPips(t))+" "+uL(t.p,riskPips(t)):""):null)}${kv("Take profit",t.tp!=null?fmtP(t.tp)+(tpPips(t)!=null?" · "+nf(tpPips(t))+" "+uL(t.p,tpPips(t)):""):null)}${o?"":kv("Sortie",t.x!=null?fmtP(t.x):null)}${kv("R:R prévu",rr!=null?"1 : "+nf(rr,2):null)}</div>
     <div class="card" style="margin-top:12px">${kv("Psychologie",t.emo?esc(t.emo):null)}${kv("Plan respecté",t.plan?"Oui":"Non")}</div>
     ${t.n?`<div class="card" style="margin-top:12px"><div class="note">${esc(t.n)}</div></div>`:""}
     ${t.img?`<button class="shotv" data-view aria-label="Agrandir la capture"><img alt="Capture du trade"><span>${ic("search",2)}</span></button>`:""}
@@ -1234,12 +1293,17 @@ function renderSet(root){
     <div class="sec">Mes paires</div>
     <div class="chips wr">${s.pairs.map(x=>`<span class="chip tg${x===s.pair?" on":""}" data-pd="${esc(x)}">${esc(x)}${s.pairs.length>1?`<button class="xx" data-px="${esc(x)}" aria-label="Retirer ${esc(x)}">${ic("x",2.4)}</button>`:""}</span>`).join("")}<button class="chip add" id="sAddPair">+ Paire</button></div>
     <p class="hint">La paire en surbrillance est choisie d'office dans « Nouveau trade ». Touche une autre paire pour changer.</p>
+    <div class="sec">Compter les écarts en</div>
+    <div class="seg" id="unit"><button data-v="pips" class="${inPts()?"":"on"}">Pips</button><button data-v="points" class="${inPts()?"on":""}">Points (comme MT5)</button></div>
+    <p class="hint">${inPts()?"Comme le réticule de MetaTrader 5 : sur EUR/USD, 1,08500 → 1,08506 = 6 points. 10 points = 1 pip.":"Sur EUR/USD, 1 pip = 0,0001 = 10 points de MT5 : 1,08500 → 1,08506 = 0,6 pip (6 points). L'équivalent en points est rappelé sous les pips."}</p>
     <div class="sec">Mes setups</div>
     <div class="chips wr">${s.setups.map((x,i)=>`<span class="chip tg">${esc(x)}<button class="xx" data-rm="${i}" aria-label="Retirer ${esc(x)}">${ic("x",2.4)}</button></span>`).join("")}<button class="chip add" id="addSet">+ Setup</button></div>
+    <div class="sec">Mes émotions</div>
+    <div class="chips wr">${s.emos.map((x,i)=>`<span class="chip tg">${esc(x)}<button class="xx" data-rme="${i}" aria-label="Retirer ${esc(x)}">${ic("x",2.4)}</button></span>`).join("")}<button class="chip add" id="addEmo">+ Émotion</button></div>
     <div class="sec">Mes données</div>
     <div class="mini3"><button id="bExp">${ic("save")}<span>Sauvegarder</span></button><button id="bImp">${ic("load")}<span>Restaurer</span></button><button id="bCsv">${ic("table")}<span>Excel</span></button></div>
-    <button class="lnk neg" id="bWipe">Effacer les trades de « ${esc(ACC().name)} »</button>
-    <p class="mut" style="font-size:12.5px;text-align:center;margin:18px 10px;line-height:1.45">Tout reste uniquement sur ce téléphone, rien n'est envoyé sur Internet. · Journal ${VERSION}</p>`;
+    <p class="hint">Pour effacer un compte, touche-le dans « Mes comptes » puis « Supprimer ce compte » tout en bas.</p>
+    <p class="mut" style="font-size:12.5px;text-align:center;margin:18px 10px;line-height:1.45">Tout reste uniquement sur ce téléphone, rien n'est envoyé sur Internet. · J.Trade ${VERSION}</p>`;
   $("sProf").onclick=editProfile;
   el.querySelectorAll("#thm button").forEach(b=>b.onclick=e=>{setTheme(b.dataset.v,e);el.querySelectorAll("#thm button").forEach(x=>x.classList.toggle("on",x===b))});
   el.querySelectorAll("[data-ea]").forEach(b=>b.onclick=()=>editAccount(b.dataset.ea));
@@ -1250,7 +1314,9 @@ function renderSet(root){
   el.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{s.setups.splice(+b.dataset.rm,1);save();renderAdd();rs()});
   $("addSet").onclick=()=>askText("Nouveau setup","ex. FVG, ODB, OTE…","",n=>{if(n&&!s.setups.includes(n)){s.setups.push(n);save();renderAdd();rs()}});
   $("bExp").onclick=exportJSON;$("bImp").onclick=()=>$("fileIn").click();$("bCsv").onclick=exportCSV;
-  $("bWipe").onclick=()=>confirmSheet("Effacer ce journal ?","Tous les trades de « "+ACC().name+" » seront supprimés de ce téléphone. Pense à faire une sauvegarde avant.","Tout effacer",()=>{dropImgs(S.trades.filter(t=>t.a===S.acc));S.trades=S.trades.filter(t=>t.a!==S.acc);save();renderAll();toast("Journal vidé")});
+  el.querySelectorAll("#unit button").forEach(b=>b.onclick=()=>{s.unit=b.dataset.v;save();renderAll();rs();toast(inPts()?"Écarts comptés en points, comme MT5":"Écarts comptés en pips")});
+  el.querySelectorAll("[data-rme]").forEach(b=>b.onclick=()=>{s.emos.splice(+b.dataset.rme,1);save();renderAdd();rs()});
+  $("addEmo").onclick=()=>askText("Nouvelle émotion","ex. Confiance, Peur…","",n=>{if(n&&!s.emos.includes(n)){s.emos.push(n);save();renderAdd();rs()}});
 }
 function giveFile(name,text,type){
   const blob=new Blob([text],{type});const f=new File([blob],name,{type});
@@ -1259,15 +1325,27 @@ function giveFile(name,text,type){
 }
 async function exportJSON(){
   const images={};for(const t of S.trades)if(t.img){try{const d=await IMG.get(t.img);if(d)images[t.img]=d}catch(_){}}
-  giveFile("journal-"+today()+".json",JSON.stringify({app:"journal",v:3,date:new Date().toISOString(),data:S,images}),"application/json");S.lastBackup=Date.now();save();if(cur===PG.rem)renderRem();updateBadge();toast("Sauvegarde prête")}
+  S.lastBackup=Date.now();save();
+  giveFile("jtrade-"+today()+".json",JSON.stringify({app:"jtrade",v:4,date:new Date().toISOString(),data:S,images}),"application/json");S.lastBackup=Date.now();save();if(cur===PG.rem)renderRem();updateBadge();toast("Sauvegarde prête")}
 function exportCSV(){
   const H=["Compte","Date","Heure d'entrée","Date de sortie","Heure de sortie","Durée (min)","Paire","Sens","Statut","Entrée","Stop","Objectif","Sortie","Clôture","Lots","Pips","R","Risque","Résultat","Frais","Monnaie","Setup","Psychologie","Plan respecté","Notes"];
   const q=v=>{v=v==null?"":String(v);return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v},n=v=>v==null?"":String(Math.round(v*100000)/100000).replace(".",",");
   const an=id=>S.accounts.find(a=>a.id===id)||{};
   const rows=sortT(S.trades).reverse().map(t=>[an(t.a).name,t.d,t.h,t.cd,t.ch,dur(t)!=null?Math.round(dur(t)):"",t.p,t.s==="sell"?"Vente":"Achat",isOpen(t)?"En cours":"Clôturé",n(t.e),n(t.sl),n(t.tp),n(t.x),t.ex?EXITS[t.ex]:"",n(t.l),n(pips(t)),n(rGot(t)),n(riskMoney(t)),n(t.r),n(t.fee),an(t.a).cur,t.set,t.emo,t.plan?"Oui":"Non",t.n].map(q).join(";"));
-  giveFile("journal-"+today()+".csv","﻿"+[H.join(";"),...rows].join("\n"),"text/csv");
+  giveFile("jtrade-"+today()+".csv","﻿"+[H.join(";"),...rows].join("\n"),"text/csv");
 }
-$("fileIn").onchange=e=>{const f=e.target.files[0];e.target.value="";if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const j=JSON.parse(rd.result),raw=j.data||j;if(!Array.isArray(raw.trades))throw 0;const d=fix(raw);confirmSheet("Restaurer cette sauvegarde ?",d.trades.length+" trade"+(d.trades.length>1?"s":"")+" et "+d.accounts.length+" compte"+(d.accounts.length>1?"s":"")+" dans le fichier. Ils remplaceront ceux du journal.","Restaurer",()=>{dropImgs(S.trades);Object.entries(j.images||{}).forEach(([k,v])=>IMG.set(k,v).catch(()=>{}));S.trades=d.trades;S.accounts=d.accounts;S.acc=d.acc;S.profile=d.profile;Object.assign(S.settings,d.settings);save();applyTheme();addT=blank();renderAll();closeAllPush();toast("Sauvegarde restaurée")})}catch(_){toast("Ce fichier n'est pas une sauvegarde du journal")}};rd.readAsText(f)};
+// restaurer : tout revient comme avant (profil, photo, comptes, trades, captures, réglages)
+$("fileIn").onchange=e=>{const f=e.target.files[0];e.target.value="";if(!f)return;const rd=new FileReader();rd.onload=()=>{
+  let j,raw;try{j=JSON.parse(rd.result);raw=j.data||j;if(!raw||!Array.isArray(raw.trades))throw 0}catch(_){toast("Ce fichier n'est pas une sauvegarde de J.Trade");return}
+  const d=fix(JSON.parse(JSON.stringify(raw))),imgs=j.images||{},ni=Object.keys(imgs).length;
+  confirmSheet("Restaurer cette sauvegarde ?",`${d.trades.length} trade${d.trades.length>1?"s":""}, ${d.accounts.length} compte${d.accounts.length>1?"s":""}${ni?", "+ni+" capture"+(ni>1?"s":""):""}${d.profile.first?", profil de "+d.profile.first:""}. Tout ce qu'il y a dans l'appli sera remplacé.`,"Restaurer",async()=>{
+    const keep=new Set(Object.keys(imgs));dropImgs(S.trades.filter(t=>t.img&&!keep.has(t.img)));
+    let bad=0;for(const [k,v] of Object.entries(imgs)){try{await IMG.set(k,v)}catch(_){bad++}}
+    Object.keys(S).forEach(k=>delete S[k]);Object.assign(S,d);save();
+    applyTheme();addT=blank();homeMonth=ym(today());closeAllPush();renderAll();go(PG.home);
+    toast(bad?"Restaurée, mais "+bad+" capture(s) n'ont pas pu être remises":"Sauvegarde restaurée")});
+};rd.readAsText(f)};
+
 
 /* ================= thème ================= */
 const mq=matchMedia("(prefers-color-scheme: dark)");
@@ -1446,7 +1524,7 @@ function demoTrades(){
   let seed=7+S.accounts.indexOf(ACC())*13;const rnd=()=>(seed=(seed*9301+49297)%233280)/233280;
   for(let k=0;k<140;k++){
     const d=new Date(base-Math.floor(k*1.9)*864e5);if(d.getDay()===0||d.getDay()===6)continue;
-    const gold=rnd()<.2,p=gold?"XAU/USD":"EUR/USD",ps=pipSize(p),s=rnd()>.5?"buy":"sell",dir=s==="buy"?1:-1;
+    const gold=rnd()<.2,p=gold?"XAU/USD":"EUR/USD",ps=asset(p).pip,s=rnd()>.5?"buy":"sell",dir=s==="buy"?1:-1;
     const e=gold?+(2600+rnd()*80).toFixed(2):+(1.07+rnd()*.03).toFixed(5),risk=gold?30+Math.round(rnd()*40):8+Math.round(rnd()*14);
     const u=rnd(),ex=u<.38?"TP":u<.78?"SL":u<.88?"BE":"Manuel",rr=ex==="TP"?2:ex==="SL"?-1:ex==="BE"?0:(rnd()*2.4-.6);
     const pp=+(risk*rr).toFixed(1),x=+(e+pp*ps*dir).toFixed(gold?2:5),l=gold?[.02,.05,.1][Math.floor(rnd()*3)]:[.1,.2,.3,.5][Math.floor(rnd()*4)];
@@ -1465,7 +1543,7 @@ renderHome();renderAdd();updateBadge();
 
 /* ================= écran d'ouverture : les bougies ================= */
 // 3 haussières, une 4e qui monte puis se fait rejeter (grande mèche) et clôture en grosse baissière,
-// une petite baissière, puis 5 haussières ; ensuite « Journal » apparaît
+// une petite baissière, puis 5 haussières ; ensuite « J.Trade » apparaît
 (()=>{
   const sp=$("splash"),sv=$("spSvg");let gone=false;
   const finish=()=>{if(gone)return;gone=true;sp.classList.add("gone");setTimeout(()=>sp.remove(),700)};
